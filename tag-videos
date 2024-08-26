@@ -18,17 +18,7 @@ my $path = File::Spec->rel2abs($ARGV[1], $ARGV[0]);
 
 say "Filename is: $path";
 
-my $db = Model->connect;
-
-$db->{fh}->execute($path);
-
-# Then we get the id
-
-my $id;
-$db->{findid}->bind_columns(\$id);
-$db->{findid}->execute($path);
-while ($db->{findid}->fetch) {
-}
+my $db = Model->connect($path);
 
 my $term = Term::ReadLine->new("tag-videos");
 my $attribs = $term->Attribs;
@@ -36,8 +26,7 @@ $attribs->{completion_entry_function} = $attribs->{list_completion_function};
 
 sub list_tags
 {
-	# and the list of tags
-	my $tags = $db->selectcol_arrayref('findtags', $id);
+	my $tags = $db->find_tags;
 
 	say "Tags: ", join(' ', @$tags);
 }
@@ -58,14 +47,12 @@ while (defined ($_ = $term->readline('>'))) {
 		for my $tag (split /\s+/, $1) {
 			$tag = lc($tag);
 			# create the tag and add it
-			$db->{createtag}->execute($tag);
-			$db->{inserttag}->execute($id, $tag);
+			$db->create_tag($tag);
 		}
 	} elsif (m/^rm\s+(.*)/) {
 		for my $tag (split /\s+/, $1) {
 			$tag = lc($tag);
-			# create the tag and remove it
-			$db->{deletetag}->execute($id, $tag);
+			$db->delete_tag($tag);
 		}
 	} elsif (m/^suggest\s+(.*)/) {
 		for my $tag (split /\s+/, $1) {

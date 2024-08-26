@@ -29,7 +29,7 @@ my $requests = {
 		where t2.tag=? order by tag.tag}
 };
 
-sub connect($class)
+sub connect($class, $path)
 {
 	my $dbpath = "$FindBin::Bin/mydb";
 	my $o = bless { 
@@ -38,6 +38,7 @@ sub connect($class)
 	while (my ($k, $v) = each %$requests) {
 		$o->{$k} = $o->db->prepare($v);
 	}
+	$o->{id} = $o->id_for_path($path);
 	return $o;
 }
 
@@ -46,9 +47,43 @@ sub db($o)
 	return $o->{db};
 }
 
+sub id($o)
+{
+	return $o->{id};
+}
+
 sub selectcol_arrayref($o, $key, @rest)
 {
 	return $o->db->selectcol_arrayref($o->{$key}, {}, @rest);
 }
 
+sub id_for_path($self, $path)
+{
+	$self->{fh}->execute($path);
+
+	# Then we get the id
+
+	my $id;
+	$self->{findid}->bind_columns(\$id);
+	$self->{findid}->execute($path);
+	while ($self->{findid}->fetch) {
+	}
+	return $id;
+}
+
+sub find_tags($self)
+{
+	return $self->selectcol_arrayref('findtags', $self->id);
+}
+
+sub create_tag($self, $tag)
+{
+	$self->{createtag}->execute($tag);
+	$self->{inserttag}->execute($self->id, $tag);
+}
+
+sub delete_tag($self, $tag)
+{
+	$self->{deletetag}->execute($self->id, $tag);
+}
 1;
