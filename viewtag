@@ -1,0 +1,26 @@
+#! /bin/sh
+result=`mktemp /tmp/result.XXXXXXX`
+t=`mktemp /tmp/now.XXXXXXXXXX`
+t2=`mktemp /tmp/2nd.XXXXXXX`
+first=true
+for i in $@
+do
+	echo select path from _filetag where tag=\'$i\'| sqlite3 mydb >$t
+	if ! test -s $t
+	then
+		echo select path from _filetag where tag like \'%$i%\'| 
+		    sqlite3 mydb >$t
+	fi
+	if $first
+	then
+		cp $t $result
+		first=false
+	else
+		cat $result $t|sort|uniq -d >$t2
+		mv $t2 $result
+	fi
+	rm $t
+done
+
+cat $result
+rm -f $result $t $t2

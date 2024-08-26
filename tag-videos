@@ -49,7 +49,7 @@ sub parse_tags($words, $f)
 list_tags();
 prepare_completions();
 
-while (defined ($_ = $term->readline('>'))) {
+while (defined ($_ = $term->readline('> '))) {
 	if (m/^(?:add|t)\s+(.*)/i) {
 		parse_tags($1, 
 		    sub($tag) {
