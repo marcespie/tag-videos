@@ -18,7 +18,8 @@ my $path = File::Spec->rel2abs($ARGV[1], $ARGV[0]);
 
 say "Filename is: $path";
 
-my $db = Model->connect($path);
+my $db = Model->connect;
+$db->set_path($path);
 
 my $term = Term::ReadLine->new("tag-videos");
 my $attribs = $term->Attribs;

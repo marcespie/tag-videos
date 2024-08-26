@@ -29,7 +29,7 @@ my $requests = {
 		where t2.tag=? order by tag.tag}
 };
 
-sub connect($class, $path)
+sub connect($class)
 {
 	my $dbpath = "$FindBin::Bin/mydb";
 	my $o = bless { 
@@ -38,7 +38,6 @@ sub connect($class, $path)
 	while (my ($k, $v) = each %$requests) {
 		$o->{$k} = $o->db->prepare($v);
 	}
-	$o->set_path($path);
 	return $o;
 }
 
