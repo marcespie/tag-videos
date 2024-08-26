@@ -7,6 +7,8 @@ use Data::Dumper;
 use DBI;
 use File::Spec;
 use FindBin;
+use lib "$FindBin::Bin/lib";
+use Model;
 
 my $dbpath = "$FindBin::Bin/mydb";
 
@@ -17,39 +19,16 @@ my $path = File::Spec->rel2abs($ARGV[1], $ARGV[0]);
 
 say "Filename is: $path";
 
-my $db = DBI->connect("dbi:SQLite:dbname=$dbpath", "", "");
+my $db = Model->connect;
 
-my $fh = $db->prepare("insert into file (path) values (?)");
-my $stmt = $db->prepare("select tag from tag order by tag");
-my $findid = $db->prepare("select id from file where path=?");
-my $findtags = $db->prepare(
-    "select tag.tag from tag 
-	join filetag on tagid=tag.id
-	join file on fileid = file.id
-	where fileid = ? order by tag.tag");
-
-my $createtag = $db->prepare("insert into tag (tag) values (?)");
-
-my $inserttag = $db->prepare("insert into filetag (fileid, tagid)
-	values (?, (select id from tag where tag=?))");
-
-my $deletetag = $db->prepare("delete from filetag where fileid=?
-	and tagid=(select id from tag where tag=?)");
-
-my $suggest = $db->prepare("select distinct(tag.tag) from tag
-	join filetag on filetag.tagid=tag.id
-	join filetag t1 on t1.fileid=filetag.fileid
-	join tag t2 on t2.id=t1.tagid
-	where t2.tag=? order by tag.tag");
-# First we insert the path into the db.
-$fh->execute($path);
+$db->{fh}->execute($path);
 
 # Then we get the id
 
 my $id;
-$findid->bind_columns(\$id);
-$findid->execute($path);
-while ($findid->fetch) {
+$db->{findid}->bind_columns(\$id);
+$db->{findid}->execute($path);
+while ($db->{findid}->fetch) {
 }
 
 my $term = Term::ReadLine->new("tag-videos");
@@ -59,7 +38,7 @@ $attribs->{completion_entry_function} = $attribs->{list_completion_function};
 sub list_tags
 {
 	# and the list of tags
-	my $tags = $db->selectcol_arrayref($findtags, {}, $id);
+	my $tags = $db->selectcol_arrayref('findtags', $id);
 
 	say "Tags: ", join(' ', @$tags);
 }
@@ -67,7 +46,7 @@ sub list_tags
 sub prepare_completions
 {
 	$attribs->{completion_word} = 
-		$db->selectcol_arrayref($stmt);
+		$db->selectcol_arrayref('stmt');
 }
 
 
@@ -80,19 +59,19 @@ while (defined ($_ = $term->readline('>'))) {
 		for my $tag (split /\s+/, $1) {
 			$tag = lc($tag);
 			# create the tag and add it
-			$createtag->execute($tag);
-			$inserttag->execute($id, $tag);
+			$db->{createtag}->execute($tag);
+			$db->{inserttag}->execute($id, $tag);
 		}
 	} elsif (m/^rm\s+(.*)/) {
 		for my $tag (split /\s+/, $1) {
 			$tag = lc($tag);
 			# create the tag and remove it
-			$deletetag->execute($id, $tag);
+			$db->{deletetag}->execute($id, $tag);
 		}
 	} elsif (m/^suggest\s+(.*)/) {
 		for my $tag (split /\s+/, $1) {
 			$tag = lc($tag);
-			my $tags = $db->selectcol_arrayref($suggest, {}, $tag);
+			my $tags = $db->selectcol_arrayref('suggest', $tag);
 			say "Suggestions: ", join(' ', @$tags);
 		}
 	} elsif (m/^list\s*$/) {
