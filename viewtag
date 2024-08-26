@@ -1,15 +1,17 @@
 #! /bin/sh
+db=/home/espie/projects/tag-videos/mydb
+query="sqlite3 -readonly $db"
 result=`mktemp /tmp/result.XXXXXXX`
 t=`mktemp /tmp/now.XXXXXXXXXX`
 t2=`mktemp /tmp/2nd.XXXXXXX`
 first=true
 for i in $@
 do
-	echo select path from _filetag where tag=\'$i\'| sqlite3 mydb >$t
+	echo select path from _filetag where tag=\'$i\'| $query >$t
 	if ! test -s $t
 	then
 		echo select path from _filetag where tag like \'%$i%\'| 
-		    sqlite3 mydb >$t
+		    $query >$t
 	fi
 	if $first
 	then
