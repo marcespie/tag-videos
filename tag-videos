@@ -34,32 +34,38 @@ sub list_tags
 sub prepare_completions
 {
 	$attribs->{completion_word} = 
-		$db->selectcol_arrayref('stmt');
+		$db->selectcol_arrayref('alltags');
+}
+
+sub parse_tags($words, $f)
+{
+	for my $tag (split /\s+/, $words) {
+		$tag = lc($tag);
+		&$f($tag);
+	}
 }
 
 
 list_tags();
 prepare_completions();
 
-
 while (defined ($_ = $term->readline('>'))) {
 	if (m/^(?:add|t)\s+(.*)/i) {
-		for my $tag (split /\s+/, $1) {
-			$tag = lc($tag);
-			# create the tag and add it
+		parse_tags($1, 
+		    sub($tag) {
 			$db->create_tag($tag);
-		}
+		    });
 	} elsif (m/^rm\s+(.*)/) {
-		for my $tag (split /\s+/, $1) {
-			$tag = lc($tag);
+		parse_tags($1, 
+		    sub($tag) {
 			$db->delete_tag($tag);
-		}
+		    });
 	} elsif (m/^suggest\s+(.*)/) {
-		for my $tag (split /\s+/, $1) {
-			$tag = lc($tag);
-			my $tags = $db->selectcol_arrayref('suggest', $tag);
+		parse_tags($1,
+		    sub($tag) {
+			my $tags = $db->suggestions($tag);
 			say "Suggestions: ", join(' ', @$tags);
-		}
+		    });
 	} elsif (m/^list\s*$/) {
 		list_tags();
 	} elsif (m/^known\s*$/) {

@@ -7,7 +7,7 @@ my $dbpath = "$FindBin::Bin/mydb";
 
 my $requests = {
 	fh => qq{insert into file (path) values (?)},
-	stmt => qq{select tag from tag order by tag},
+	alltags => qq{select tag from tag order by tag},
 	findid => qq{select id from file where path=?},
 	findtags => 
 	    qq{select tag.tag from tag 
@@ -21,7 +21,7 @@ my $requests = {
 	deletetag =>
 	    qq{delete from filetag where fileid=?
 		and tagid=(select id from tag where tag=?)},
-	suggest =>
+	suggestions =>
 	    qq{select distinct(tag.tag) from tag 
 	    	join filetag on filetag.tagid=tag.id
 		join filetag t1 on t1.fileid=filetag.fileid
@@ -38,7 +38,7 @@ sub connect($class, $path)
 	while (my ($k, $v) = each %$requests) {
 		$o->{$k} = $o->db->prepare($v);
 	}
-	$o->{id} = $o->id_for_path($path);
+	$o->set_path($path);
 	return $o;
 }
 
@@ -57,7 +57,7 @@ sub selectcol_arrayref($o, $key, @rest)
 	return $o->db->selectcol_arrayref($o->{$key}, {}, @rest);
 }
 
-sub id_for_path($self, $path)
+sub set_path($self, $path)
 {
 	$self->{fh}->execute($path);
 
@@ -68,7 +68,8 @@ sub id_for_path($self, $path)
 	$self->{findid}->execute($path);
 	while ($self->{findid}->fetch) {
 	}
-	return $id;
+	$self->{id} = $id;
+	$self->{path} = $path;
 }
 
 sub find_tags($self)
@@ -86,4 +87,10 @@ sub delete_tag($self, $tag)
 {
 	$self->{deletetag}->execute($self->id, $tag);
 }
+
+sub suggestions($self, $tag)
+{
+	return $self->selectcol_arrayref('suggestions', $tag);
+}
+
 1;
