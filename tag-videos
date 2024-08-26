@@ -39,8 +39,7 @@ sub prepare_completions
 
 sub parse_tags($words, $f)
 {
-	for my $tag (split /\s+/, $words) {
-		$tag = lc($tag);
+	for my $tag (split /\s+/, lc($words)) {
 		&$f($tag);
 	}
 }
@@ -55,26 +54,28 @@ while (defined ($_ = $term->readline('> '))) {
 		    sub($tag) {
 			$db->create_tag($tag);
 		    });
-	} elsif (m/^rm\s+(.*)/) {
+	} elsif (m/^rm\s+(.*)/i) {
 		parse_tags($1, 
 		    sub($tag) {
 			$db->delete_tag($tag);
 		    });
-	} elsif (m/^suggest\s+(.*)/) {
+	} elsif (m/^suggest\s+(.*)/i) {
 		parse_tags($1,
 		    sub($tag) {
 			my $tags = $db->suggestions($tag);
 			say "Suggestions: ", join(' ', @$tags);
 		    });
-	} elsif (m/^list\s*$/) {
+	} elsif (m/^list\s*$/i) {
 		list_tags();
 	} elsif (m/^known\s*$/) {
 		prepare_completions();
 		say "known tags: ", join(' ', @{$attribs->{completion_word}});
-	} elsif (m/^help\s*/) {
+	} elsif (m/^help\s*/i) {
 		say "help/add/t/rm/list/suggest/known/quit"
-	} elsif (m/^quit\s*$/) {
+	} elsif (m/^(?:quit|q)\s*$/i) {
 		last;
+	} elsif (m/^\s*$/) {
+		# nothing !
 	} else {
 		say "Unknown command $_\n"
 	}
