@@ -1,0 +1,3 @@
+#! /bin/sh
+rm -f mydb
+sqlite3 mydb <mydb.sql
