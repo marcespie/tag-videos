@@ -92,4 +92,12 @@ sub suggestions($self, $tag)
 	return $self->selectcol_arrayref('suggestions', $tag);
 }
 
+sub cleanup($self)
+{
+	$self->db->do(
+	    qq{delete from tag where id in 
+	    	(select id from tag where tag.id not in 
+		    (select tagid from filetag))});
+	$self->db->disconnect;
+}
 1;

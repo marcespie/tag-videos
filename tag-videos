@@ -68,13 +68,19 @@ while (defined ($_ = $term->readline('> '))) {
 		    });
 	} elsif (m/^list\s*$/i) {
 		list_tags();
-	} elsif (m/^known\s*$/) {
+	} elsif (m/^known\s*(.*)$/) {
+		my $filter = $1;
 		prepare_completions();
-		say "known tags: ", join(' ', @{$attribs->{completion_word}});
+		my @tags = @{$attribs->{completion_word}};
+		if ($filter ne '') {
+			@tags = grep { /\Q$filter\E/ } @tags;
+		}
+		say "known tags: ", join(' ', @tags);
 	} elsif (m/^help\s*/i) {
 		say "help/add/t/rm/list/suggest/known/quit"
 	} elsif (m/^(?:quit|q)\s*$/i) {
-		last;
+		$db->cleanup;
+		exit;
 	} elsif (m/^\s*$/) {
 		# nothing !
 	} else {
