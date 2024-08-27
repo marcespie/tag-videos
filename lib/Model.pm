@@ -3,8 +3,6 @@ use v5.36;
 package Model;
 use DBI;
 
-my $dbpath = "$FindBin::Bin/mydb";
-
 my $requests = {
 	fh => qq{insert into file (path) values (?)},
 	alltags => qq{select tag from tag order by tag},
