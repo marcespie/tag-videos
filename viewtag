@@ -2,27 +2,19 @@
 db=lib/mydb
 cmd="sqlite3 -readonly $db"
 query="select path from file join filetag on filetag.fileid=file.id"
+subquery="select fileid from filetag join tag on tag.id=filetag.tagid"
 
-j=0
+connector=where
 for i in $@
 do
-	query="$query join filetag f$j on f$j.fileid=filetag.fileid"
-	query="$query join tag t$j on f$j.tagid=t$j.id"
-	j=`expr $j + 1`
-done
-j=0
-for i in $@
-do
-	case $j in
-		0) query="$query where ";;
-		*) query="$query and ";;
-	esac
+	query="$query $connector "
+	connector=and
 	t=`echo select distinct 1 from filetag join tag on tag.id=filetag.tagid where tag=\'$i\'|$cmd`
 	case $t in 
-		1) query="$query t$j.tag='$i'";;
-		*) query="$query t$j.tag like '%$i%'";;
+		1) s1="$subquery where tag='$i'";;
+		*) s1="$subquery where tag like '%$i'";;
 	esac
-	j=`expr $j + 1`
+	query="$query fileid in ($s1)"
 done
 
-echo $query|$cmd
+echo $query #|$cmd
