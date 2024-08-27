@@ -9,12 +9,17 @@ for i in $@
 do
 	query="$query $connector "
 	connector=and
+	not=
+	case $i in
+		!*) not=not; i=${i#!};;
+	esac
+
 	t=`echo select distinct 1 from filetag join tag on tag.id=filetag.tagid where tag=\'$i\'|$cmd`
 	case $t in 
 		1) s1="$subquery where tag='$i'";;
 		*) s1="$subquery where tag like '%$i'";;
 	esac
-	query="$query fileid in ($s1)"
+	query="$query fileid $not in ($s1)"
 done
 
-echo $query #|$cmd
+echo $query |$cmd
