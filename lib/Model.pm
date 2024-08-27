@@ -31,7 +31,7 @@ my $requests = {
 
 sub connect($class)
 {
-	my $dbpath = $ENV{DBPATH} // "$FindBin::Bin/mydb";
+	my $dbpath = $ENV{DBPATH} // "$FindBin::Bin/lib/mydb";
 	my $o = bless { 
 		db => DBI->connect("dbi:SQLite:dbname=$dbpath", "", "")
 	    }, $class;

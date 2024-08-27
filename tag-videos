@@ -9,8 +9,6 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use Model;
 
-my $dbpath = "$FindBin::Bin/mydb";
-
 # as it the script gets two parameters: cwd + path name
 
 die "bad number of parameters" if @ARGV < 2;
