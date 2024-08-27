@@ -1,28 +1,28 @@
 #! /bin/sh
-db=/home/espie/projects/tag-videos/mydb
-query="sqlite3 -readonly $db"
-result=`mktemp /tmp/result.XXXXXXX`
-t=`mktemp /tmp/now.XXXXXXXXXX`
-t2=`mktemp /tmp/2nd.XXXXXXX`
-first=true
+db=lib/mydb
+cmd="sqlite3 -readonly $db"
+query="select path from file join filetag on filetag.fileid=file.id"
+
+j=0
 for i in $@
 do
-	echo select path from _filetag where tag=\'$i\'| $query >$t
-	if ! test -s $t
-	then
-		echo select path from _filetag where tag like \'%$i%\'| 
-		    $query >$t
-	fi
-	if $first
-	then
-		cp $t $result
-		first=false
-	else
-		cat $result $t|sort|uniq -d >$t2
-		mv $t2 $result
-	fi
-	rm $t
+	query="$query join filetag f$j on f$j.fileid=filetag.fileid"
+	query="$query join tag t$j on f$j.tagid=t$j.id"
+	j=`expr $j + 1`
+done
+j=0
+for i in $@
+do
+	case $j in
+		0) query="$query where ";;
+		*) query="$query and ";;
+	esac
+	t=`echo select distinct 1 from filetag join tag on tag.id=filetag.tagid where tag=\'$i\'|$cmd`
+	case $t in 
+		1) query="$query t$j.tag='$i'";;
+		*) query="$query t$j.tag like '%$i%'";;
+	esac
+	j=`expr $j + 1`
 done
 
-cat $result
-rm -f $result $t $t2
+echo $query|$cmd
