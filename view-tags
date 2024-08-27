@@ -15,7 +15,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 cmd="sqlite3 -readonly ${DBPATH:=lib/mydb}"
-query="select path from file join filetag on filetag.fileid=file.id"
+query="select distinct path from file join filetag on filetag.fileid=file.id"
 subquery="select fileid from filetag join tag on tag.id=filetag.tagid"
 
 connector=where
@@ -36,4 +36,4 @@ do
 	query="$query fileid $not in ($s1)"
 done
 
-echo $query |$cmd
+echo $query order by path|$cmd
