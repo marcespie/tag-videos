@@ -1,9 +1,9 @@
 .\" Copyright (c) 2024 Marc Espie <espie@openbsd.org>
-.\" 
+.\"
 .\" Permission to use, copy, modify, and distribute this software for any
 .\" purpose with or without fee is hereby granted, provided that the above
 .\" copyright notice and this permission notice appear in all copies.
-.\" 
+.\"
 .\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
 .\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -11,21 +11,18 @@
 .\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-.\" 
+.\"
 .Dd $Mdocdate$
 .Dt TAG-VIDEOS 1
 .Os
 .Sh NAME
 .Nm tag-videos
-.Nd interactive tag manager for use with
-.Xr mpv 1 .
+.Nd interactive tag manager for use with mpv
 .Sh SYNOPSIS
 .Nm tag-videos
 .Ar cwd
 .Ar path
 .Op Ar database
-.Sh SEE ALSO
-.Xr view-tags 1
 .Sh DESCRIPTION
 .Nm
 is not intended for manual use but rather by adding a line like
@@ -80,5 +77,13 @@ knows about already defined tags, so that completion works in the interface.
 Note that tags are committed on the fly: even if you don't quit
 .Nm
 properly, they will still be updated.
-.Sh AUTHOR
+.Sh ENVIRONMENT
+.Bl -tag -width DBPATH -offset indent
+.It Ev DBPATH
+Path to the database instead of the default
+.Pa lib/mydb
+.El
+.Sh SEE ALSO
+.Xr view-tags 1
+.Sh AUTHORS
 .An Marc Espie
