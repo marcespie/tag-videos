@@ -1,0 +1,84 @@
+.\" Copyright (c) 2024 Marc Espie <espie@openbsd.org>
+.\" 
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\" 
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\" 
+.Dd $Mdocdate$
+.Dt TAG-VIDEOS 1
+.Os
+.Sh NAME
+.Nm tag-videos
+.Nd interactive tag manager for use with
+.Xr mpv 1 .
+.Sh SYNOPSIS
+.Nm tag-videos
+.Ar cwd
+.Ar path
+.Op Ar database
+.SH SEE ALSO
+.Xr view-tags 1
+.Sh DESCRIPTION
+.Nm
+is not intended for manual use but rather by adding a line like
+.Bd -literal -offset indent
+t run "xterm" "-e" "tag-videos" "${working-directory}" "${path}"
+.Ed
+.Pp
+to the
+.Pa input.conf
+configuration file of
+.Xr mpv 1 .
+.Pp
+This will open an interactive terminal with a few commands you can use
+to manipulate tags on your videos.
+.Pp
+Commands are as follows:
+.Bl -tag -width suggestion -offset indent
+.It Cm add Ar tag ...
+Add
+.Ar tag
+to the current file.
+.It Cm help
+Show a summary of existing commands.
+.It Cm known Op Ar partial
+Show tags that contain the
+.Ar partial
+string.
+.It Cm list
+Show tags for the current file.
+.It Cm quit
+Quit.
+.It Cm rm Ar tag ...
+Remove
+.Ar tag
+from the current file.
+.It Cm suggest Ar tag ...
+Show other tags that are mentioned with
+.Ar tag .
+.It Cm + Ar tag ...
+Synonym for
+.Cm add .
+.It Cm q
+Synonym for
+.Cm quit .
+.El
+.Pp
+Tags will be lowercased, and there might be restrictions on valid characters.
+.Pp
+.Nm
+knows about already defined tags, so that completion works in the interface.
+.Pp
+Note that tags are committed on the fly: even if you don't quit
+.Nm
+properly, they will still be updated.
+.Sh AUTHOR
+.An Marc Espie
