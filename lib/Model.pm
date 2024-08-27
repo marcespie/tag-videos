@@ -29,9 +29,9 @@ my $requests = {
 		where t2.tag=? order by tag.tag}
 };
 
-sub connect($class)
+sub connect($class, $param)
 {
-	my $dbpath = $ENV{DBPATH} // "$FindBin::Bin/lib/mydb";
+	my $dbpath = $param // $ENV{DBPATH} // "$FindBin::Bin/lib/mydb";
 	my $o = bless { 
 		db => DBI->connect("dbi:SQLite:dbname=$dbpath", "", "")
 	    }, $class;
