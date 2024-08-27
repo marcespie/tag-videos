@@ -16,6 +16,7 @@
 
 use v5.36;
 
+# XXX this actually expects Gnu Readline for tab completion to work
 use Term::ReadLine;
 use Data::Dumper;
 use File::Spec;

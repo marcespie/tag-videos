@@ -100,6 +100,9 @@ sub delete_tag($self, $tag)
 	$self->{deletetag}->execute($self->id, $tag);
 }
 
+# TODO: collect the number of files containing each tag, so that we can
+# sort from more likely to least likely
+# should also filter out tags which are already set on our file
 sub suggestions($self, $tag)
 {
 	return $self->selectcol_arrayref('suggestions', $tag);
