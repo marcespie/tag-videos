@@ -1,6 +1,5 @@
 #! /bin/sh
-db=lib/mydb
-cmd="sqlite3 -readonly $db"
+cmd="sqlite3 -readonly ${DBPATH:=lib/mydb}"
 query="select path from file join filetag on filetag.fileid=file.id"
 subquery="select fileid from filetag join tag on tag.id=filetag.tagid"
 
