@@ -63,17 +63,17 @@ list_tags();
 prepare_completions();
 
 while (defined ($_ = $term->readline('> '))) {
-	if (m/^(?:add|t)\s+(.*)/i) {
+	if (m/^(?:add|t)\b\s*(.*)/i) {
 		parse_tags($1, 
 		    sub($tag) {
 			$db->create_tag($tag);
 		    });
-	} elsif (m/^rm\s+(.*)/i) {
+	} elsif (m/^rm\b\s*(.*)/i) {
 		parse_tags($1, 
 		    sub($tag) {
 			$db->delete_tag($tag);
 		    });
-	} elsif (m/^suggest\s+(.*)/i) {
+	} elsif (m/^suggest\b\s*(.*)/i) {
 		parse_tags($1,
 		    sub($tag) {
 			my $tags = $db->suggestions($tag);
@@ -81,7 +81,7 @@ while (defined ($_ = $term->readline('> '))) {
 		    });
 	} elsif (m/^list\s*$/i) {
 		list_tags();
-	} elsif (m/^known\s*(.*)$/) {
+	} elsif (m/^known\b\s*(.*)$/) {
 		my $filter = $1;
 		prepare_completions();
 		my @tags = @{$attribs->{completion_word}};
@@ -90,12 +90,16 @@ while (defined ($_ = $term->readline('> '))) {
 		}
 		say "known tags: ", join(' ', @tags);
 	} elsif (m/^help\s*/i) {
-		say "help/add/t/rm/list/suggest/known/quit"
+		say "help/add/t/rm/rename/list/suggest/known/quit"
 	} elsif (m/^(?:quit|q)\s*$/i) {
 		$db->cleanup;
 		exit;
-	} elsif (m/^rename\s+(\S+)\s+(\S+)\s*$/) {
-		$db->rename_tag(lc($1), lc($2));
+	} elsif (m/^rename\b\s*/i) {
+		if (m/^rename\s+(\S+)\s+(\S+)\s*$/) {
+			$db->rename_tag(lc($1), lc($2));
+		} else {
+			say "Error: rename oldtag newtag";
+		}
 	} elsif (m/^\s*$/) {
 		# nothing !
 	} else {
