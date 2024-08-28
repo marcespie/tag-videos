@@ -43,6 +43,7 @@ sub create($class, $p)
 {
 	my $db = DBI->connect("dbi:SQLite:dbname=$p", "", "");
 	undef $/;
+	# XXX somehow DBI want separate statements, so we split on ;
 	for my $sql(split /;/, <DATA>) {
 		$db->do($sql.';');
 	}
