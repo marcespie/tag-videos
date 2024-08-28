@@ -36,16 +36,22 @@ my $requests = {
 	    qq{delete from filetag where fileid=?
 		and tagid=(select id from tag where tag=?)},
 	suggestions =>
-	    qq{select distinct(tag.tag) from tag 
+	    qq{select tag.tag, count(filetag.id) from tag 
 	    	join filetag on filetag.tagid=tag.id
 		join filetag t1 on t1.fileid=filetag.fileid
 		join tag t2 on t2.id=t1.tagid
-		where t2.tag=? order by tag.tag},
+		where t2.tag=? 
+		    and tag.id!=t2.id 
+		    and tag.id not in 
+			(select tagid from filetag where fileid=?)
+		group by tag.tag},
 	renametag =>
 	    qq{update tag set tag=? where tag=?}
 
 };
 
+#		    and tag.tag not in 
+#			(select tagid from file where fileid=?)
 sub connect($class, $param)
 {
 	my $o = bless { 
@@ -103,12 +109,17 @@ sub delete_tag($self, $tag)
 	$self->{deletetag}->execute($self->id, $tag);
 }
 
-# TODO: collect the number of files containing each tag, so that we can
-# sort from more likely to least likely
-# should also filter out tags which are already set on our file
 sub suggestions($self, $tag)
 {
-	return $self->selectcol_arrayref('suggestions', $tag);
+	my $s = $self->{suggestions};
+	my $h = {};
+	$s->execute($tag, $self->{id});
+	my ($t, $count);
+	$s->bind_columns(\($t, $count));
+	while ($s->fetch) {
+		$h->{$t} = $count;
+	}
+	return $h;
 }
 
 sub rename_tag($self, $old, $new)
