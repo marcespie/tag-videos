@@ -1,4 +1,0 @@
-#! /bin/sh
-db=lib/mydb
-rm -f $db
-sqlite3 $db <mydb.sql
