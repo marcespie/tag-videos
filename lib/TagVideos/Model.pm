@@ -40,7 +40,10 @@ my $requests = {
 	    	join filetag on filetag.tagid=tag.id
 		join filetag t1 on t1.fileid=filetag.fileid
 		join tag t2 on t2.id=t1.tagid
-		where t2.tag=? order by tag.tag}
+		where t2.tag=? order by tag.tag},
+	renametag =>
+	    qq{update tag set tag=? where tag=?}
+
 };
 
 sub connect($class, $param)
@@ -106,6 +109,11 @@ sub delete_tag($self, $tag)
 sub suggestions($self, $tag)
 {
 	return $self->selectcol_arrayref('suggestions', $tag);
+}
+
+sub rename_tag($self, $old, $new)
+{
+	$self->{renametag}->execute($new, $old);
 }
 
 sub cleanup($self)

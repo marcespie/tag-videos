@@ -94,6 +94,8 @@ while (defined ($_ = $term->readline('> '))) {
 	} elsif (m/^(?:quit|q)\s*$/i) {
 		$db->cleanup;
 		exit;
+	} elsif (m/^rename\s+(\S+)\s+(\S+)\s*$/) {
+		$db->rename_tag(lc($1), lc($2));
 	} elsif (m/^\s*$/) {
 		# nothing !
 	} else {
