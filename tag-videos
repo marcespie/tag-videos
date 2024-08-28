@@ -24,7 +24,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use TagVideos::Model;
 
-# as it the script gets two parameters: cwd + path name
+# as it stands the script gets two parameters: cwd + path name
 
 die "bad number of parameters" if @ARGV != 2 and @ARGV != 3;
 my $path = File::Spec->rel2abs($ARGV[1], $ARGV[0]);

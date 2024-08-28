@@ -16,7 +16,8 @@ use v5.36;
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 package TagVideos::Model;
-use DBI;
+use TagVideos::Base;
+our @ISA = qw(TagVideos::Base);
 
 my $requests = {
 	fh => qq{insert into file (path) values (?)},
@@ -44,9 +45,8 @@ my $requests = {
 
 sub connect($class, $param)
 {
-	my $dbpath = $param // $ENV{DBPATH} // "$FindBin::Bin/lib/mydb";
 	my $o = bless { 
-		db => DBI->connect("dbi:SQLite:dbname=$dbpath", "", "")
+		db => $class->SUPER::connect($param)
 	    }, $class;
 	while (my ($k, $v) = each %$requests) {
 		$o->{$k} = $o->db->prepare($v);
