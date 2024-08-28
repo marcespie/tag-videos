@@ -25,7 +25,7 @@ sub dbpath($, $param)
 	return $param // $ENV{DBPATH} // "$FindBin::Bin/lib/mydb";
 }
 
-sub connect($class, $param, $readonly = 0)
+sub connect($class, $param = undef, $readonly = 0)
 {
 	my $p = $class->dbpath($param);
 	my $h = {};
@@ -35,4 +35,30 @@ sub connect($class, $param, $readonly = 0)
 	return DBI->connect("dbi:SQLite:dbname=$p", "", "", $h);
 }
 
+sub create($class, $param = undef)
+{
+	my $db = $class->connect($param);
+	undef $/;
+	for my $sql(split /;/, <DATA>) {
+		say $sql;
+		$db->do($sql.';');
+	}
+}
+
 1;
+__DATA__
+-- XXX maybe it would be better to have a directory/file separation
+-- together with a file view ?
+CREATE TABLE if not exists file 
+	(Id integer primary key, path text unique on conflict ignore);
+CREATE TABLE if not exists tag 
+	(Id integer primary key, tag text unique on conflict ignore);
+CREATE TABLE if not exists filetag 
+	(Id integer primary key, FileId integer, TagId integer, 
+	constraint nodups unique (FileId, TagId) on conflict ignore);
+-- just in case one wants to check
+create view _filetag as
+	select tag.tag as tag, file.path as path
+	from filetag
+	    join tag on filetag.tagid=tag.id
+	    join file on filetag.fileid=file.id;
