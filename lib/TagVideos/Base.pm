@@ -32,15 +32,18 @@ sub connect($class, $param = undef, $readonly = 0)
 	if ($readonly) {
 		$h->{ReadOnly} = 1;
 	}
+	if (!-f $p) {
+		say "Creating database $p";
+		$class->create($p);
+	}
 	return DBI->connect("dbi:SQLite:dbname=$p", "", "", $h);
 }
 
-sub create($class, $param = undef)
+sub create($class, $p)
 {
-	my $db = $class->connect($param);
+	my $db = DBI->connect("dbi:SQLite:dbname=$p", "", "");
 	undef $/;
 	for my $sql(split /;/, <DATA>) {
-		say $sql;
 		$db->do($sql.';');
 	}
 }

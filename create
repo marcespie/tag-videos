@@ -1,0 +1,8 @@
+#! /usr/bin/perl
+
+use v5.36;
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use TagVideos::Base;
+
+TagVideos::Base->create;

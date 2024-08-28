@@ -97,6 +97,6 @@ while (defined ($_ = $term->readline('> '))) {
 	} elsif (m/^\s*$/) {
 		# nothing !
 	} else {
-		say "Unknown command $_\n"
+		say "Unknown command $_";
 	}
 }
