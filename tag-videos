@@ -22,7 +22,7 @@ use Data::Dumper;
 use File::Spec;
 use FindBin;
 use lib "$FindBin::Bin/lib";
-use Model;
+use TagVideos::Model;
 
 # as it the script gets two parameters: cwd + path name
 
@@ -31,7 +31,7 @@ my $path = File::Spec->rel2abs($ARGV[1], $ARGV[0]);
 
 say "Filename is: $path";
 
-my $db = Model->connect($ARGV[2]);
+my $db = TagVideos::Model->connect($ARGV[2]);
 $db->set_path($path);
 
 my $term = Term::ReadLine->new("tag-videos");
