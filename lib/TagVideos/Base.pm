@@ -22,7 +22,7 @@ use FindBin;
 
 sub dbpath($, $param)
 {
-	return $param // $ENV{DBPATH} // "$FindBin::Bin/lib/mydb";
+	return $param // $ENV{DBPATH} // $ENV{HOME}."/video_tags";
 }
 
 sub connect($class, $param = undef, $readonly = 0)
