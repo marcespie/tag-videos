@@ -25,10 +25,14 @@ sub dbpath($, $param)
 	return $param // $ENV{DBPATH} // "$FindBin::Bin/lib/mydb";
 }
 
-sub connect($class, $param)
+sub connect($class, $param, $readonly = 0)
 {
 	my $p = $class->dbpath($param);
-	return DBI->connect("dbi:SQLite:dbname=$p", "", "");
+	my $h = {};
+	if ($readonly) {
+		$h->{ReadOnly} = 1;
+	}
+	return DBI->connect("dbi:SQLite:dbname=$p", "", "", $h);
 }
 
 1;
