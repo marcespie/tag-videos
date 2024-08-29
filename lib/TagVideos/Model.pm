@@ -52,10 +52,10 @@ my $requests = {
 
 #		    and tag.tag not in 
 #			(select tagid from file where fileid=?)
-sub connect($class, $param)
+sub connect($class, $database)
 {
 	my $o = bless { 
-		db => $class->SUPER::connect($param)
+		db => $class->SUPER::connect($database, {})
 	    }, $class;
 	while (my ($k, $v) = each %$requests) {
 		$o->{$k} = $o->db->prepare($v);

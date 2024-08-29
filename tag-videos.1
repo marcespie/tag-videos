@@ -20,14 +20,15 @@
 .Nd interactive tag manager for use with mpv
 .Sh SYNOPSIS
 .Nm tag-videos
-.Ar cwd
+.Op Fl c Ar cwd
+.Op Fl d Ar database
 .Ar path
 .Op Ar database
 .Sh DESCRIPTION
 .Nm
 is not intended for manual use but rather by adding a line like
 .Bd -literal -offset indent
-t run "xterm" "-e" "tag-videos" "${working-directory}" "${path}"
+t run "xterm" "-e" "tag-videos" "-c" "${working-directory}" "${path}"
 .Ed
 .Pp
 to the

@@ -20,18 +20,14 @@ package TagVideos::Base;
 use DBI;
 use FindBin;
 
-sub dbpath($, $param)
+sub dbpath($, $path)
 {
-	return $param // $ENV{DBPATH} // $ENV{HOME}."/video_tags";
+	return $path // $ENV{DBPATH} // $ENV{HOME}."/video_tags";
 }
 
-sub connect($class, $param = undef, $readonly = 0)
+sub connect($class, $path = undef, $h = {})
 {
-	my $p = $class->dbpath($param);
-	my $h = {};
-	if ($readonly) {
-		$h->{ReadOnly} = 1;
-	}
+	my $p = $class->dbpath($path);
 	if (!-f $p) {
 		say "Creating database $p";
 		$class->create($p);

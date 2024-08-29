@@ -21,17 +21,24 @@ use Term::ReadLine;
 use Data::Dumper;
 use File::Spec;
 use FindBin;
+use Getopt::Std;
 use lib "$FindBin::Bin/lib";
 use TagVideos::Model;
 
+my $opts;
+
+if (!getopts('c:d:', $opts) || @ARGV != 1) {
+	say STDERR "Usage: $0 [-c cwd] [-d database] path";
+	exit 1;
+}
+
 # as it stands the script gets two parameters: cwd + path name
 
-die "bad number of parameters" if @ARGV != 2 and @ARGV != 3;
-my $path = File::Spec->rel2abs($ARGV[1], $ARGV[0]);
+my $path = File::Spec->rel2abs($ARGV[0], $opts->{c});
 
 say "Filename is: $path";
 
-my $db = TagVideos::Model->connect($ARGV[2]);
+my $db = TagVideos::Model->connect($opts->{d});
 $db->set_path($path);
 
 my $term = Term::ReadLine->new("tag-videos");

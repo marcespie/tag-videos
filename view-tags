@@ -16,10 +16,18 @@
 
 use v5.36;
 use FindBin;
+use Getopt::Std;
 use lib "$FindBin::Bin/lib";
 use TagVideos::Base;
 
-my $db = TagVideos::Base->connect(undef, 1);
+my $opts;
+
+if (!getopts('d:', $opts) || @ARGV == 0) {
+	say STDERR "Usage: $0 [-d database] [!]tag ...";
+	exit 1;
+}
+
+my $db = TagVideos::Base->connect($opts->{d}, {Readonly => 1});
 
 my $query = qq{
 	select distinct path from file 
