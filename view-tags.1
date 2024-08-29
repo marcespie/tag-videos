@@ -31,8 +31,14 @@ and prints them to standard output.
 If a tag doesn't exist, the parameter will be used as a partial match,
 .Pp
 Prefixing a tag with ! will instead select files that do not contain this tag.
+.Pp
+.Nm
+takes a single option:
+.Fl d Ar database
+to select another database instead of the default
+.Pa $HOME/videos_tags .
 .Sh ENVIRONMENT
-.Bl -tag -width DBPATH -offset indent
+.Bl -tag -width DBPATH
 .It Ev DBPATH
 Path to the database instead of the default
 .Pa $HOME/video_tags

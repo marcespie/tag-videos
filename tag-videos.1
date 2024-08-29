@@ -35,6 +35,23 @@ to the
 configuration file of
 .Xr mpv 1 .
 .Pp
+Options are as follows
+.Bl -tag -width d data
+.It Fl c Ar cwd
+Set
+.Ar cwd
+to which
+.Ar path
+will be relative, conforming to
+.Xr mpv 1 Ns 's
+running model.
+.It Fl d Ar database
+Select
+.Ar database
+instead of the default
+.Pa $HOME/videos_tags .
+.El
+.Pp
 This will open an interactive terminal with a few commands you can use
 to manipulate tags on your videos.
 .Pp
@@ -65,7 +82,8 @@ into
 .Ar new .
 .It Cm suggest Ar tag ...
 Show other tags that are mentioned with
-.Ar tag .
+.Ar tag ,
+but not yet set on the current file, ordered by frequency.
 .It Cm + Ar tag ...
 Synonym for
 .Cm add .
@@ -83,7 +101,7 @@ Note that tags are committed on the fly: even if you don't quit
 .Nm
 properly, they will still be updated.
 .Sh ENVIRONMENT
-.Bl -tag -width DBPATH -offset indent
+.Bl -tag -width DBPATH
 .It Ev DBPATH
 Path to the database instead of the default
 .Pa $HOME/video_tags
