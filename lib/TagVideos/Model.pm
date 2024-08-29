@@ -50,8 +50,6 @@ my $requests = {
 
 };
 
-#		    and tag.tag not in 
-#			(select tagid from file where fileid=?)
 sub connect($class, $database)
 {
 	my $o = bless { 
@@ -81,8 +79,6 @@ sub selectcol_arrayref($o, $key, @rest)
 sub set_path($self, $path)
 {
 	$self->{fh}->execute($path);
-
-	# Then we get the id
 
 	my $id;
 	$self->{findid}->bind_columns(\$id);

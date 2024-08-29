@@ -95,7 +95,8 @@ while (defined ($_ = $term->readline('> '))) {
 		parse_tags($1,
 		    sub($tag) {
 			my $tags = $db->suggestions($tag);
-			say "Suggestions: ", join(' ', pretty_print_suggestions($tags));
+			say "Suggestions: ", 
+			    join(' ', pretty_print_suggestions($tags));
 		    });
 	} elsif (m/^list\s*$/i) {
 		list_tags();
