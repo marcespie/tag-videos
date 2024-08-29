@@ -70,9 +70,9 @@ sub pretty_print_suggestions($h)
 }
 
 list_tags();
-prepare_completions();
 
 while (defined ($_ = $term->readline('> '))) {
+	prepare_completions();
 	if (m/^(?:add|t)\b\s*(.*)/i) {
 		parse_tags($1, 
 		    sub($tag) {
