@@ -28,8 +28,8 @@ use TagVideos::Model;
 use locale;
 my $opts = {};
 
-if (!getopts('c:d:', $opts) || @ARGV != 1) {
-	say STDERR "Usage: $0 [-c cwd] [-d database] path";
+if (!getopts('c:d:h:', $opts) || @ARGV != 1) {
+	say STDERR "Usage: $0 [-c cwd] [-d database] [-h history] path";
 	exit 1;
 }
 
@@ -45,6 +45,12 @@ $db->set_path($path);
 my $term = Term::ReadLine->new("tag-videos");
 my $attribs = $term->Attribs;
 $attribs->{completion_entry_function} = $attribs->{list_completion_function};
+
+my $history = $opts->{h} // $ENV{HOME}."/.tag-videos-history";
+
+if (-f $history) {
+	$term->ReadHistory($history);
+}
 
 sub list_tags
 {
@@ -113,6 +119,7 @@ while (defined ($_ = $term->readline('> '))) {
 		say "help/add/t/rm/rename/list/suggest/known/quit"
 	} elsif (m/^(?:quit|q)\s*$/i) {
 		$db->cleanup;
+		$term->WriteHistory($history);
 		exit;
 	} elsif (m/^rename\b\s*/i) {
 		if (m/^rename\s+(\S+)\s+(\S+)\s*$/) {

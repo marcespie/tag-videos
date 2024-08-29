@@ -22,6 +22,7 @@
 .Nm tag-videos
 .Op Fl c Ar cwd
 .Op Fl d Ar database
+.Op Fl h Ar history
 .Ar path
 .Sh DESCRIPTION
 .Nm
@@ -50,6 +51,11 @@ Select
 .Ar database
 instead of the default
 .Pa $HOME/videos_tags .
+.It Fl h Ar history
+Select
+.Ar history
+file instead of the default
+.Pa $HOME/.tag-videos-history .
 .El
 .Pp
 This will open an interactive terminal with a few commands you can use
