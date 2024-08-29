@@ -20,6 +20,10 @@ install:
 	@${INSTALL_DATA} lib/TagVideos/Base.pm $(DESTDIR)${LIBDIR}/TagVideos
 	@${INSTALL_DATA} lib/TagVideos/Model.pm $(DESTDIR)${LIBDIR}/TagVideos
 
+uninstall:
+	@rm -f $(DESTDIR)${BINDIR}/{tag-videos,view-tags}
+	@rm -f $(DESTDIR)${MAN1DIR}/{tag-videos,view-tags}.1
+	@rm -f $(DESTDIR)${LIBDIR}/TagVideos/{Base.pm,Model.pm}
+	@rmdir $(DESTDIR)${LIBDIR}/TagVideos
 
-.PHONY: install
-
+.PHONY: install uninstall
