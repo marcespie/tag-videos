@@ -49,6 +49,7 @@ sub create($class, $p)
 __DATA__
 -- XXX maybe it would be better to have a directory/file separation
 -- together with a file view ?
+PRAGMA encoding = "UTF-8";
 CREATE TABLE if not exists file 
 	(Id integer primary key, path text unique on conflict ignore);
 CREATE TABLE if not exists tag 

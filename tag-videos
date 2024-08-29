@@ -25,6 +25,7 @@ use Getopt::Std;
 use lib "$FindBin::Bin/lib";
 use TagVideos::Model;
 
+use locale;
 my $opts;
 
 if (!getopts('c:d:', $opts) || @ARGV != 1) {

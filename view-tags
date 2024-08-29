@@ -19,6 +19,7 @@ use FindBin;
 use Getopt::Std;
 use lib "$FindBin::Bin/lib";
 use TagVideos::Base;
+use locale;
 
 my $opts;
 
