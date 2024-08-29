@@ -87,12 +87,12 @@ list_tags();
 prepare_completions();
 
 while (defined ($_ = $term->readline('> '))) {
-	prepare_completions();
 	if (m/^(?:add|t)\b\s*(.*)/i) {
 		parse_tags($1, 
 		    sub($tag) {
 			$db->create_tag($tag);
 		    });
+		prepare_completions();
 	} elsif (m/^rm\b\s*(.*)/i) {
 		parse_tags($1, 
 		    sub($tag) {
@@ -127,6 +127,7 @@ while (defined ($_ = $term->readline('> '))) {
 		} else {
 			say "Error: rename oldtag newtag";
 		}
+		prepare_completions();
 	} elsif (m/^\s*$/) {
 		# nothing !
 	} else {
