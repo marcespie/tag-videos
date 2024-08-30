@@ -32,6 +32,17 @@ sub connect($class, $path = undef, $h = {})
 		say "Creating database $p";
 		$class->create($p);
 	}
+	my $db = DBI->connect("dbi:SQLite:dbname=$p", "", "", 
+	    {
+		RaiseError => 1,
+		PrintError => 0});
+	eval {
+	    $db->prepare("select * from descr");
+	};
+	if ($@) {
+		say "Updating database $p";
+		$class->create($p);
+	}
 	return DBI->connect("dbi:SQLite:dbname=$p", "", "", $h);
 }
 
@@ -40,7 +51,7 @@ sub create($class, $p)
 	my $db = DBI->connect("dbi:SQLite:dbname=$p", "", "");
 	undef $/;
 	# XXX somehow DBI want separate statements, so we split on ;
-	for my $sql(split /;/, <DATA>) {
+	for my $sql (split /;/, <DATA>) {
 		$db->do($sql.';');
 	}
 }
@@ -57,8 +68,10 @@ CREATE TABLE if not exists tag
 CREATE TABLE if not exists filetag 
 	(Id integer primary key, FileId integer, TagId integer, 
 	constraint nodups unique (FileId, TagId) on conflict ignore);
+CREATE TABLE if not exists descr
+	(Id integer primary key, FileId integer, Descr text);
 -- just in case one wants to check
-create view _filetag as
+create view if not exists _filetag as
 	select tag.tag as tag, file.path as path
 	from filetag
 	    join tag on filetag.tagid=tag.id
