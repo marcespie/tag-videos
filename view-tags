@@ -23,7 +23,7 @@ use locale;
 
 my $opts = {};
 
-if (!getopts('d:', $opts) || @ARGV == 0) {
+if (!getopts('d:D:', $opts) || @ARGV == 0) {
 	say STDERR "Usage: $0 [-d database] [!]tag ...";
 	exit 1;
 }
@@ -57,6 +57,16 @@ for my $i (@ARGV) {
 	push(@extra, "fileid $not in ($s1)");
 }
 
+if ($opts->{D}) {
+	my $i = $opts->{D};
+	my $not = '';
+	if ($i =~ s/^!//) {
+		$not = 'not';
+	}
+	push(@ARGV, $i);
+	my $s = "select fileid from descr where descr like '%'||?||'%'";
+	push(@extra, "fileid $not in ($s1)");
+}
 
 my $fullquery = "$query where ".join(" and ", @extra)." order by path";
 my $stmt = $db->prepare($fullquery);

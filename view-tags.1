@@ -21,6 +21,7 @@
 .Sh SYNOPSIS
 .Nm view-tags
 .Op Fl d Ar database
+.Op Fl D Oo ! Oc Ns Ar descr
 .Oo ! Oc Ns Ar tag ...
 .Sh DESCRIPTION
 Extract from the database all files that contain all the tags given
@@ -33,10 +34,13 @@ If a tag doesn't exist, the parameter will be used as a partial match,
 Prefixing a tag with ! will instead select files that do not contain this tag.
 .Pp
 .Nm
-takes a single option:
-.Fl d Ar database
-to select another database instead of the default
+takes the following options:
+.Bl -tag -width data
+.It Fl d Ar database
+Select another database instead of the default
 .Pa $HOME/videos_tags .
+.It Fl D Oo ! Oc Ns Ar descr
+Filter by description .
 .Sh ENVIRONMENT
 .Bl -tag -width DBPATH
 .It Ev DBPATH
