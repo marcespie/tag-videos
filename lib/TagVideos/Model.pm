@@ -48,8 +48,9 @@ my $requests = {
 	renametag =>
 	    qq{update tag set tag=? where tag=?},
 	readdescr =>
-	    qq{select descr from descr where fileid=?}
-
+	    qq{select descr from descr where fileid=?},
+	setdescr =>
+	    qq{insert or replace into descr (descr, fileid) values (?, ?)}
 };
 
 sub connect($class, $database)
@@ -131,8 +132,14 @@ sub read_descr($self)
 	$s->execute($self->{id});
 	my $descr;
 	$s->bind_columns(\($descr));
-	$s->fetch;
+	while ($s->fetch) {
+	}
 	return $descr;
+}
+
+sub set_descr($self, $descr)
+{
+	$self->{setdescr}->execute($descr, $self->{id});
 }
 
 sub cleanup($self)
@@ -144,7 +151,8 @@ sub cleanup($self)
 	$self->db->do(
 	    qq{delete from file where id in 
 	    	(select id from file where file.id not in 
-		    (select fileid from filetag))});
+		    (select fileid from filetag))
+		and id not in (select fileid from descr)});
 	$self->db->disconnect;
 }
 1;

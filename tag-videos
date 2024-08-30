@@ -22,6 +22,7 @@ use Data::Dumper;
 use FindBin;
 use Getopt::Std;
 use File::Spec;
+use File::Temp;
 use lib "$FindBin::Bin/lib";
 use TagVideos::Model;
 use TagVideos::Path;
@@ -64,7 +65,7 @@ sub list_tags
 	say "Tags: ", join(' ', @$tags);
 }
 
-sub prepare_completions
+sub prepare_completions()
 {
 	$attribs->{completion_word} = 
 		$db->selectcol_arrayref('alltags');
@@ -87,6 +88,32 @@ sub pretty_print_suggestions($h)
 	}
 	return @l;
 }
+
+sub edit_description()
+{
+	my $fh = File::Temp->new(
+		UNLINK => 0, 
+		TEMPLATE => "/tmp/edit.XXXXXXXXXXX"
+	    );
+	my $tempname = $fh->filename;
+	my $descr = $db->read_descr;
+	if (defined $descr) {
+		print $fh $descr;
+	}
+	close $fh;
+	my $editor = $ENV{VISUAL} // $ENV{EDIT} // "vi";
+	system("$editor $tempname");
+	open(my $fh2, "<", $tempname) or die;
+	local $/;
+	undef $/;
+	$descr = <$fh2>;
+	close $fh2;
+	$descr =~ s/\n$//s;
+	print $descr;
+	$db->set_descr($descr);
+	unlink($tempname);
+}
+
 
 my $descr = $db->read_descr;
 if (defined $descr) {
@@ -127,7 +154,7 @@ while (defined ($_ = $term->readline('> '))) {
 		}
 		say "known tags: ", join(' ', @tags);
 	} elsif (m/^help\s*/i) {
-		say "help/add/t/rm/rename/list/suggest/known/quit"
+		say "help/add/t/rm/rename/list/suggest/descr/known/quit"
 	} elsif (m/^(?:quit|q)\s*$/i) {
 		$db->cleanup;
 		$term->WriteHistory($history);
@@ -139,6 +166,8 @@ while (defined ($_ = $term->readline('> '))) {
 			say "Error: rename oldtag newtag";
 		}
 		prepare_completions();
+	} elsif (m/^descr\s*/) {
+		edit_description();
 	} elsif (m/^\s*$/) {
 		# nothing !
 	} else {

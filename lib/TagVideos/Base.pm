@@ -69,7 +69,7 @@ CREATE TABLE if not exists filetag
 	(Id integer primary key, FileId integer, TagId integer, 
 	constraint nodups unique (FileId, TagId) on conflict ignore);
 CREATE TABLE if not exists descr
-	(Id integer primary key, FileId integer, Descr text);
+	(Id integer primary key, FileId integer unique, Descr text);
 -- just in case one wants to check
 create view if not exists _filetag as
 	select tag.tag as tag, file.path as path
