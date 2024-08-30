@@ -1,0 +1,60 @@
+.\" Copyright (c) 2024 Marc Espie <espie@openbsd.org>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt FIX-FILENAMES 1
+.Os
+.Sh NAME
+.Nm fix-filenames
+.Nd resolve symlinks in a video-tags(1) database
+.Sh SYNOPSIS
+.Nm fix-filenames
+.Op Fl v
+.Op Fl d Ar database
+.Sh DESCRIPTION
+By default,
+.Xr videos-tags 1
+now resolves symlinks to absolute names.
+.Pp
+.Nm
+can fix an existing database by resolving symlinks after the fact
+and collapsing aliases to the same file.
+.Pp
+.Nm
+takes the following options:
+.Bl -tag -width data
+.It Fl d Ar database
+Select another database instead of the default
+.Pa $HOME/videos_tags .
+.It Fl v
+Shows what changes are made to the database .
+.El
+.Sh ENVIRONMENT
+.Bl -tag -width DBPATH
+.It Ev DBPATH
+Path to the database instead of the default
+.Pa $HOME/video_tags
+.El
+.Sh FILES
+.Bl -tag -width DBPATH
+.It Pa $HOME/videos_tags
+Default path to the
+.Xr sqlite3 1
+database .
+.El
+.Sh SEE ALSO
+.Xr sqlite3 1 ,
+.Xr tag-videos 1
+.Sh AUTHORS
+.An Marc Espie
