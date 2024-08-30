@@ -19,23 +19,28 @@ use v5.36;
 # XXX this actually expects Gnu Readline for tab completion to work
 use Term::ReadLine;
 use Data::Dumper;
-use File::Spec;
 use FindBin;
 use Getopt::Std;
+use File::Spec;
 use lib "$FindBin::Bin/lib";
 use TagVideos::Model;
+use TagVideos::Path;
 
 use locale;
 my $opts = {};
 
-if (!getopts('c:d:H:', $opts) || @ARGV != 1) {
-	say STDERR "Usage: $0 [-c cwd] [-d database] [-H history] path";
+if (!getopts('c:d:LH:', $opts) || @ARGV != 1) {
+	say STDERR "Usage: $0 [-L] [-c cwd] [-d database] [-H history] path";
 	exit 1;
 }
 
 # as it stands the script gets two parameters: cwd + path name
 
 my $path = File::Spec->rel2abs($ARGV[0], $opts->{c});
+
+if (!$opts->{L}) {
+	$path = TagVideos::Path->resolve_link($path);
+}
 
 say "Filename is: $path";
 

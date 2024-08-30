@@ -20,6 +20,7 @@
 .Nd interactive tag manager for use with mpv
 .Sh SYNOPSIS
 .Nm tag-videos
+.Op Fl L
 .Op Fl c Ar cwd
 .Op Fl d Ar database
 .Op Fl h Ar history
@@ -56,6 +57,8 @@ Select
 .Ar history
 file instead of the default
 .Pa $HOME/.tag-videos-history .
+.It Fl L
+Don't resolve symlinks to absolute paths.
 .El
 .Pp
 This will open an interactive terminal with a few commands you can use
