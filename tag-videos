@@ -30,8 +30,8 @@ use TagVideos::Path;
 use locale;
 my $opts = {};
 
-if (!getopts('c:d:LH:', $opts) || @ARGV != 1) {
-	say STDERR "Usage: $0 [-L] [-c cwd] [-d database] [-H history] path";
+if (!getopts('qc:d:LH:', $opts) || @ARGV != 1) {
+	say STDERR "Usage: $0 [-Lq] [-c cwd] [-d database] [-H history] path";
 	exit 1;
 }
 
@@ -63,6 +63,9 @@ sub list_tags
 	my $tags = $db->find_tags;
 
 	say "Tags: ", join(' ', @$tags);
+	if (@$tags >0 && $opts->{q}) {
+		exit 0;
+	}
 }
 
 sub prepare_completions()
@@ -123,7 +126,7 @@ list_tags();
 prepare_completions();
 
 while (defined ($_ = $term->readline('> '))) {
-	if (m/^(?:add|t)\b\s*(.*)/i) {
+	if (m/^(?:add|t|tag)\b\s*(.*)/i) {
 		parse_tags($1, 
 		    sub($tag) {
 			$db->create_tag($tag);
