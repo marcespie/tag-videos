@@ -108,8 +108,6 @@ sub edit_description()
 	undef $/;
 	$descr = <$fh2>;
 	close $fh2;
-	$descr =~ s/\n$//s;
-	print $descr;
 	$db->set_descr($descr);
 	unlink($tempname);
 }
