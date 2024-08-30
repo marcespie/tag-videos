@@ -9,7 +9,7 @@ INSTALL_BIN = install -m 755
 INSTALL_DATA = install -m 644
 
 BINS = {tag-videos,view-tags,fix-filenames}
-MODS = {Base,Model,Path}
+MODULES = {Base,Model,Path}.pm
 
 DESTDIR =
 
@@ -18,12 +18,12 @@ install:
 	@${INSTALL_BIN} ${BINS} $(DESTDIR)${BINDIR}
 	@${INSTALL_MAN} ${BINS}.1 $(DESTDIR)${MAN1DIR}
 	@${INSTALL_DIR} $(DESTDIR)${LIBDIR}/TagVideos
-	@${INSTALL_DATA} lib/TagVideos/${MODS}.pm $(DESTDIR)${LIBDIR}/TagVideos
+	@${INSTALL_DATA} lib/TagVideos/${MODULES} $(DESTDIR)${LIBDIR}/TagVideos
 
 uninstall:
 	@rm -f $(DESTDIR)${BINDIR}/${BINS}
 	@rm -f $(DESTDIR)${MAN1DIR}/${BINS}.1
-	@rm -f $(DESTDIR)${LIBDIR}/TagVideos/${MODS}
+	@rm -f $(DESTDIR)${LIBDIR}/TagVideos/${MODULES}
 	@rmdir $(DESTDIR)${LIBDIR}/TagVideos
 
 .PHONY: install uninstall
