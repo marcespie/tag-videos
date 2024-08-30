@@ -88,6 +88,12 @@ sub pretty_print_suggestions($h)
 	return @l;
 }
 
+my $descr = $db->read_descr;
+if (defined $descr) {
+	say "Descr:";
+	say $descr;
+}
+
 list_tags();
 prepare_completions();
 

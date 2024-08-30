@@ -46,7 +46,9 @@ my $requests = {
 			(select tagid from filetag where fileid=?)
 		group by tag.tag},
 	renametag =>
-	    qq{update tag set tag=? where tag=?}
+	    qq{update tag set tag=? where tag=?},
+	readdescr =>
+	    qq{select descr from descr where fileid=?}
 
 };
 
@@ -121,6 +123,16 @@ sub suggestions($self, $tag)
 sub rename_tag($self, $old, $new)
 {
 	$self->{renametag}->execute($new, $old);
+}
+
+sub read_descr($self)
+{
+	my $s = $self->{readdescr};
+	$s->execute($self->{id});
+	my $descr;
+	$s->bind_columns(\($descr));
+	$s->fetch;
+	return $descr;
 }
 
 sub cleanup($self)
