@@ -28,8 +28,8 @@ use TagVideos::Model;
 use locale;
 my $opts = {};
 
-if (!getopts('c:d:h:', $opts) || @ARGV != 1) {
-	say STDERR "Usage: $0 [-c cwd] [-d database] [-h history] path";
+if (!getopts('c:d:H:', $opts) || @ARGV != 1) {
+	say STDERR "Usage: $0 [-c cwd] [-d database] [-H history] path";
 	exit 1;
 }
 

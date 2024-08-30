@@ -37,7 +37,7 @@ configuration file of
 .Xr mpv 1 .
 .Pp
 Options are as follows
-.Bl -tag -width d data
+.Bl -tag -width data
 .It Fl c Ar cwd
 Set
 .Ar cwd
@@ -51,7 +51,7 @@ Select
 .Ar database
 instead of the default
 .Pa $HOME/videos_tags .
-.It Fl h Ar history
+.It Fl H Ar history
 Select
 .Ar history
 file instead of the default
@@ -60,6 +60,10 @@ file instead of the default
 .Pp
 This will open an interactive terminal with a few commands you can use
 to manipulate tags on your videos.
+.Pp
+All tags are saved in an
+.Xr sqlite3 1
+database encoded as UTF-8 .
 .Pp
 Commands are as follows:
 .Bl -tag -width suggestion -offset indent
@@ -111,8 +115,21 @@ properly, they will still be updated.
 .It Ev DBPATH
 Path to the database instead of the default
 .Pa $HOME/video_tags
+.It Ev LANG
+.Nm
+heeds locale information.
+.El
+.Sh FILES
+.Bl -tag -width DBPATH
+.It Pa $HOME/videos_tags
+Default path to the
+.Xr sqlite3 1
+database .
+.It Pa $HOME/.tag-videos-history
+Default saved history file.
 .El
 .Sh SEE ALSO
+.Xr sqlite3 1 ,
 .Xr view-tags 1
 .Sh AUTHORS
 .An Marc Espie
