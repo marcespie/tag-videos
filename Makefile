@@ -8,7 +8,8 @@ INSTALL_DIR = install -d -m 755
 INSTALL_BIN = install -m 755
 INSTALL_DATA = install -m 644
 
-BINS = {tag-videos,view-tags,fix-filenames}
+BINS = tag-videos view-tags fix-filenames
+MANS = ${BINS:=.1}
 MODULES = {Base,Model,Path}.pm
 
 DESTDIR =
@@ -16,13 +17,13 @@ DESTDIR =
 
 install:
 	@${INSTALL_BIN} ${BINS} $(DESTDIR)${BINDIR}
-	@${INSTALL_MAN} ${BINS}.1 $(DESTDIR)${MAN1DIR}
+	@${INSTALL_MAN} ${MANS} $(DESTDIR)${MAN1DIR}
 	@${INSTALL_DIR} $(DESTDIR)${LIBDIR}/TagVideos
 	@${INSTALL_DATA} lib/TagVideos/${MODULES} $(DESTDIR)${LIBDIR}/TagVideos
 
 uninstall:
 	@rm -f $(DESTDIR)${BINDIR}/${BINS}
-	@rm -f $(DESTDIR)${MAN1DIR}/${BINS}.1
+	@rm -f $(DESTDIR)${MAN1DIR}/${MANS}
 	@rm -f $(DESTDIR)${LIBDIR}/TagVideos/${MODULES}
 	@rmdir $(DESTDIR)${LIBDIR}/TagVideos
 
