@@ -29,7 +29,7 @@ sub usage()
 	exit 1;
 }
 
-if (!getopts('o:L') || @ARGV == 0) {
+if (!getopts('o:L', $opts) || @ARGV == 0) {
 	usage();
 	
 }
@@ -52,6 +52,7 @@ if ($opts->{o}) {
 } else {
 	$output = pop @ARGV;
 }
+
 if (@ARGV == 0 || !defined $output) {
 	usage();
 }
@@ -59,18 +60,18 @@ if (@ARGV == 0 || !defined $output) {
 my $dbout = TagVideos::Base->connect($output, {});
 
 my $addtag = $dbout->prepare(
-	qq{insert into tag (tag) values (?)});
+	qq{insert into tag (tag) values (?);});
 my $addfile = $dbout->prepare(
-	qq{insert info file (path) values (?)});
+	qq{insert into file (path) values (?);});
 
 my $tagfile = $dbout->prepare(
 	qq{insert into filetag (fileid, tagid)
-		values (select id from file where path=?,
-			select id from tag where tag=?)});
+		values ((select id from file where path=?),
+			(select id from tag where tag=?));});
 
 my $adddescr = $dbout->prepare(
 	qq{insert into descr (fileid, descr)
-		values (select id from file where path=?, ?)});
+		values ((select id from file where path=?), ?);});
 			
 
 for my $i (@ARGV) {
