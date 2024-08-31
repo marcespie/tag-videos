@@ -8,6 +8,7 @@ INSTALL_DIR = install -d -m 755
 INSTALL_BIN = install -m 755
 INSTALL_DATA = install -m 644
 
+# with this construction, you can't have a binary without a manpage !
 BINS = tag-videos view-tags fix-filenames
 MANS = ${BINS:=.1}
 MODULES = {Base,Model,Path}.pm
