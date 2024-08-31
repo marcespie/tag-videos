@@ -1,0 +1,107 @@
+#! /usr/bin/perl
+
+# Copyright (c) 2024 Marc Espie <espie@openbsd.org>
+# 
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+use v5.36;
+use FindBin;
+use Getopt::Std;
+use lib "$FindBin::Bin/lib";
+use TagVideos::Base;
+use TagVideos::Path;
+
+my $opts = {};
+
+sub usage()
+{
+	say STDERR "Usage: $0 [-L] [-o output] db ...";
+	exit 1;
+}
+
+if (!getopts('o:L') || @ARGV == 0) {
+	usage();
+	
+}
+
+my $cache = {};
+
+sub resolve_link($path)
+{
+	if (!$opts->{L}) {
+		return $path;
+    	}
+	$cache->{$path} //= Tag::Videos::Path->resolve_link($path);
+	return $cache->{$path};
+}
+
+
+my $output;
+if ($opts->{o}) {
+	$output = $opts->{o};
+} else {
+	$output = pop @ARGV;
+}
+if (@ARGV == 0 || !defined $output) {
+	usage();
+}
+
+my $dbout = TagVideos::Base->connect($output, {});
+
+my $addtag = $dbout->prepare(
+	qq{insert into tag (tag) values (?)});
+my $addfile = $dbout->prepare(
+	qq{insert info file (path) values (?)});
+
+my $tagfile = $dbout->prepare(
+	qq{insert into filetag (fileid, tagid)
+		values (select id from file where path=?,
+			select id from tag where tag=?)});
+
+my $adddescr = $dbout->prepare(
+	qq{insert into descr (fileid, descr)
+		values (select id from file where path=?, ?)});
+			
+
+for my $i (@ARGV) {
+	my $db = TagVideos::Base->connect($i, {ReadOnly => 1});
+	my $gettag = $db->prepare(qq{select tag from tag});
+	my ($tag, $path, $descr);
+	$gettag->bind_columns(\($tag));
+	$gettag->execute;
+	while ($gettag->fetch) {
+		$addtag->execute($tag);
+	}
+	my $getfile = $db->prepare(qq{select path from file});
+	$getfile->bind_columns(\($path));
+	$getfile->execute;
+	while ($getfile->fetch) {
+		$addfile->execute(resolve_link($path));
+	}
+	my $gettagfile = $db->prepare(qq{select tag, path from _filetag});
+	$gettagfile->bind_columns(\($tag, $path));
+	$gettagfile->execute;
+	while ($gettagfile->fetch) {
+		$tagfile->execute(resolve_link($path), $tag);
+	}
+	my $getdescr = $db->prepare(
+		qq{select path, descr from descr 
+		    join file on descr.fileid=file.id});
+	$getdescr->bind_columns(\($path, $descr));
+	$getdescr->execute;
+	while ($getdescr->fetch) {
+		$adddescr->execute(resolve_link($path), $descr);
+	}
+}
+
+
