@@ -142,6 +142,24 @@ sub set_descr($self, $descr)
 	$self->{setdescr}->execute($descr, $self->{id});
 }
 
+sub insertif($self, @tags)
+{
+	my $subquery =
+	    qq{select id from file where
+		id in (select fileid from filetag join tag on tagid=tag.id
+		    where tag.tag=?)};
+
+	my @extra;
+	for (@tags) {
+		push(@extra, $subquery);
+	}
+	my $query =
+		qq{insert into filetag (tagid, fileid) values (
+		    (select id from tag where tag.tag=?),
+		    (select id from file where }.join(' and ', @extra).qq{));};
+	return $self->db->prepare($query);
+}
+
 sub cleanup($self)
 {
 	$self->db->do(
