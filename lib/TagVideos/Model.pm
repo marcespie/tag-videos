@@ -50,7 +50,9 @@ my $requests = {
 	readdescr =>
 	    qq{select descr from descr where fileid=?},
 	setdescr =>
-	    qq{insert or replace into descr (descr, fileid) values (?, ?)}
+	    qq{insert or replace into descr (descr, fileid) values (?, ?)},
+	readrule =>
+		qq{select rule from rules}
 };
 
 sub connect($class, $database)
@@ -145,8 +147,7 @@ sub set_descr($self, $descr)
 sub insertif($self, @tags)
 {
 	my $subquery =
-	    qq{select id from file where
-		id in (select fileid from filetag join tag on tagid=tag.id
+	    qq{id in (select fileid from filetag join tag on tagid=tag.id
 		    where tag.tag=?)};
 
 	my @extra;
@@ -157,7 +158,28 @@ sub insertif($self, @tags)
 		qq{insert into filetag (tagid, fileid) values (
 		    (select id from tag where tag.tag=?),
 		    (select id from file where }.join(' and ', @extra).qq{));};
+	say $query;
 	return $self->db->prepare($query);
+}
+
+sub parse_rules($self)
+{
+	for my $rule ($self->selectcol_arrayref('readrule')) {
+		$self->parse_rule($rule);
+	}
+	
+}
+
+sub parse_rule($self, $rule)
+{
+	if ($rule =~ m/^tag\s+(.*)\s+IF\s+(.*)/) {
+		my ($set, $cond) = (lc($1), lc($2));
+		my @tags = split(/\s+/, $cond);
+		my $stmt = $self->insertif(@tags);
+		for my $tag (split(/\s+/, $set)) {
+			$stmt->execute($tag, @tags);
+		}
+	}
 }
 
 sub cleanup($self)

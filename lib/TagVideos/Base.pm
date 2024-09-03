@@ -38,6 +38,7 @@ sub connect($class, $path = undef, $h = {})
 		PrintError => 0});
 	eval {
 	    $db->prepare("select * from descr");
+	    $db->prepare("select * from rules");
 	};
 	if ($@) {
 		say "Updating database $p";
@@ -70,6 +71,8 @@ CREATE TABLE if not exists filetag
 	constraint nodups unique (FileId, TagId) on conflict ignore);
 CREATE TABLE if not exists descr
 	(Id integer primary key, FileId integer unique, Descr text);
+CREATE TABLE if not exists rules
+	(Id integer primary key, Rule text unique);
 -- just in case one wants to check
 create view if not exists _filetag as
 	select tag.tag as tag, file.path as path

@@ -126,7 +126,9 @@ list_tags();
 prepare_completions();
 
 while (defined ($_ = $term->readline('> '))) {
-	if (m/^(?:add|t|tag)\b\s*(.*)/i) {
+	if (m/^tag\s.*\sIF\s.*/) {
+		$db->parse_rule($_);
+	} elsif (m/^(?:add|t|tag)\b\s*(.*)/i) {
 		parse_tags($1, 
 		    sub($tag) {
 			$db->create_tag($tag);
