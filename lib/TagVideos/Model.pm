@@ -147,18 +147,17 @@ sub set_descr($self, $descr)
 sub insertif($self, @tags)
 {
 	my $subquery =
-	    qq{id in (select fileid from filetag join tag on tagid=tag.id
+	    qq{file.id in (select fileid from filetag join tag on tagid=tag.id
 		    where tag.tag=?)};
 
-	my @extra;
+	my @extra = (qq{tag.tag=?});
 	for (@tags) {
 		push(@extra, $subquery);
 	}
 	my $query =
-		qq{insert into filetag (tagid, fileid) values (
-		    (select id from tag where tag.tag=?),
-		    (select id from file where }.join(' and ', @extra).qq{));};
-	say $query;
+		qq{insert into filetag (tagid, fileid) 
+			select tag.id, file.id from tag join file where }
+		.join(' and ', @extra).qq{;};
 	return $self->db->prepare($query);
 }
 
