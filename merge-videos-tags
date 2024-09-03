@@ -25,8 +25,7 @@ my $opts = {};
 
 sub usage()
 {
-	say STDERR "Usage: $0 [-L] [-o output] db ...";
-	exit 1;
+	TagVideos::Base->usage("[-L] [-o output] db ...");
 }
 
 if (!getopts('o:L', $opts) || @ARGV == 0) {

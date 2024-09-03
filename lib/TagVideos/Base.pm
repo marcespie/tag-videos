@@ -62,6 +62,7 @@ sub usage($class, @text)
 	my $cmd = $0;
 	$cmd =~ s,.*/,,;
 	say STDERR "Usage: $cmd ".join(' ', @text);
+	exit 1;
 }
 
 1;

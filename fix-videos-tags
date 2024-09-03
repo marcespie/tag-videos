@@ -25,8 +25,7 @@ use locale;
 my $opts = {};
 
 if (!getopts('d:v', $opts) || @ARGV != 0) {
-	say STDERR "Usage: $0 [-d database]";
-	exit 1;
+	TagVideos::Base->usage("[-d database]");
 }
 
 my $db = TagVideos::Base->connect($opts->{d});

@@ -24,9 +24,8 @@ use locale;
 
 my $opts = {};
 
-if (!getopts('d:', $opts) || @ARGV != 1) {
-	say STDERR "Usage: $0 [-d database] filename ";
-	exit 1;
+if (!getopts('d:L', $opts) || @ARGV != 1) {
+	TagVideos::Base->usage("[-L] [-d database ] filename");
 }
 
 my $db = TagVideos::Base->connect($opts->{d}, {ReadOnly => 1});
@@ -34,7 +33,12 @@ my $db = TagVideos::Base->connect($opts->{d}, {ReadOnly => 1});
 my $query = $db->prepare(qq{
 	select tag from _filetag where path=? order by tag;});
 my $tag;
-$query->execute(@ARGV);
+
+my $path = $ARGV[0];
+if (!$opts->{L}) {
+	$path = TagVideos::Path->resolve_link($path);
+}
+$query->execute($path);
 $query->bind_columns(\$tag);
 
 my @tags;

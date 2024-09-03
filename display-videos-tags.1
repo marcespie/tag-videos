@@ -20,6 +20,7 @@
 .Nd display tags for a given video
 .Sh SYNOPSIS
 .Nm
+.Op Fl L
 .Op Fl d Ar database
 .Ar path
 .Sh DESCRIPTION
@@ -40,8 +41,10 @@ mp.observe_property("stream-open-filename", "string", on_file_change)
 .Ed
 .Pp
 .Nm
-takes the following option:
+takes the following options:
 .Bl -tag -width data
+.It Fl L
+Don't resolve symlinks to absolute paths.
 .It Fl d Ar database
 Select another database instead of the default
 .Pa $HOME/videos_tags .
