@@ -1,0 +1,44 @@
+#! /usr/bin/perl
+
+# Copyright (c) 2024 Marc Espie <espie@openbsd.org>
+# 
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+use v5.36;
+use FindBin;
+use Getopt::Std;
+use lib "$FindBin::Bin/lib";
+use TagVideos::Base;
+use TagVideos::Path;
+use locale;
+
+my $opts = {};
+
+if (!getopts('d:', $opts) || @ARGV != 1) {
+	say STDERR "Usage: $0 [-d database] filename ";
+	exit 1;
+}
+
+my $db = TagVideos::Base->connect($opts->{d}, {ReadOnly => 1});
+
+my $query = $db->prepare(qq{
+	select tag from _filetag where path=? order by tag;});
+my $tag;
+$query->execute(@ARGV);
+$query->bind_columns(\$tag);
+
+my @tags;
+while ($query->fetch) {
+	push(@tags, $tag);
+}
+say "Tags: ", join(' ', @tags);
