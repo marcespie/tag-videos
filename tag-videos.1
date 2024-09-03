@@ -76,6 +76,11 @@ Commands are as follows:
 Add
 .Ar tag
 to the current file.
+.Po
+But see
+.Sh RULES
+below.
+.Pc
 .It Cm descr
 Edit the description for the current file,
 using ${VISUAL} or ${EDIT} or
@@ -99,6 +104,12 @@ Rename tag
 .Ar old
 into
 .Ar new .
+.It rmrule Ar partial
+Delete permanent rules matching
+.Ar partial
+string .
+.It Cm showrules
+Show permanent rules associated with the database.
 .It Cm suggest Ar tag ...
 Show other tags that are mentioned with
 .Ar tag ,
@@ -119,6 +130,24 @@ knows about already defined tags, so that completion works in the interface.
 Note that tags are committed on the fly: even if you don't quit
 .Nm
 properly, they will still be updated.
+.Sh RULES
+The database includes some limited programmable ability to set tags based
+on other tags.
+.Pp
+The syntax is
+.Bd -ragged -offset indent
+.Oo ! Oc Ns Cm tag Ar t1 ... Cm IF Oo ! Oc Ns c1 ...
+.Ed
+.Pp
+which will add the tag(s)
+.Ar t1 ...
+to any file which also features tag(s)
+.Ar c1 ...
+(or not if starting with a !).
+.Pp
+If the command starts with a !, then it is set as a permanent rule,
+which will be saved in the database and executed on each exit from
+.Nm .
 .Sh ENVIRONMENT
 .Bl -tag -width DBPATH
 .It Ev DBPATH
