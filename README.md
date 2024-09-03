@@ -12,7 +12,7 @@ Shameless pitch: this goes really well with one of my other projects
 input, one per line.
 
 It's also possible to create simple lua scripts
-For instance, the following will run tag-videos on every new stream if it's not been tagged already, while showing existing tags.
+For instance, the following will run tag-videos on every stream change if it's not been tagged already, while showing existing tags:
 
     function on_file_change(name, value)
         if value ~= nil then
