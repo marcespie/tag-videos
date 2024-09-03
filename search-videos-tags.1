@@ -24,14 +24,14 @@
 .Op Fl D Oo ! Oc Ns Ar descr
 .Oo ! Oc Ns Ar tag ...
 .Sh DESCRIPTION
-Extract from the database all files that contain all the tags given
+Extract from the database all files that match all the tags given
 as
 .Ar tag
-and prints them to standard output.
+parameters and prints them to standard output.
 .Pp
-If a tag doesn't exist, the parameter will be used as a partial match,
+If a tag doesn't exist verbatim, the parameter will be used as a partial match,
 .Pp
-Prefixing a tag with ! will instead select files that do not contain this tag.
+Prefixing a tag with ! will instead select files that do not match this tag.
 .Pp
 .Nm
 takes the following options:
