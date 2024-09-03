@@ -52,7 +52,10 @@ my $requests = {
 	setdescr =>
 	    qq{insert or replace into descr (descr, fileid) values (?, ?)},
 	readrule =>
-		qq{select rule from rules}
+		qq{select rule from rules},
+	writerule =>
+		qq{insert into rules (rule) values (?)},
+	deleterule => qq{delete from rules where rule like '%'||?||'%'}
 };
 
 sub connect($class, $database)
@@ -155,29 +158,47 @@ sub insertif($self, @tags)
 		my $not = '';
 		if ($tag =~ s/^!//) {
 			$not = " not ";
+		}
 
 		push(@extra, 
-		    "file.id $not in (select fileid from filetag 
-		    	join tag on tagid=tag.id
-		    where tag.tag=?)";
+		    "file.id $not in (select fileid from filetag ".
+		    	"join tag on tagid=tag.id where tag.tag=?)");
 	}
 	my $query =
 		qq{insert into filetag (tagid, fileid) 
 			select tag.id, file.id from tag join file where }
-		.join(' and ', @extra).qq{;};
+		.join(' and ', @extra);
 	return $self->db->prepare($query);
 }
 
 sub parse_rules($self)
 {
-	for my $rule ($self->selectcol_arrayref('readrule')) {
+	my $counter = 0;
+	for my $rule (@{$self->selectcol_arrayref('readrule')}) {
 		$self->parse_rule($rule);
+		$counter++;
 	}
-	
+	say "Executed $counter permanent rules" if $counter;
+}
+
+sub show_rules($self)
+{
+	for my $rule (@{$self->selectcol_arrayref('readrule')}) {
+		say $rule;
+	}
+}
+
+sub delete_rule($self, $partial)
+{
+	$self->{deleterule}->execute($partial);
 }
 
 sub parse_rule($self, $rule)
 {
+	my $counter = 0;
+	if ($rule =~ s/^!//) {
+		$self->{writerule}->execute($rule);
+	}
 	if ($rule =~ m/^tag\s+(.*)\s+IF\s+(.*)/) {
 		my ($set, $cond) = (lc($1), lc($2));
 		my @tags = split(/\s+/, $cond);
@@ -199,6 +220,7 @@ sub cleanup($self)
 	    	(select id from file where file.id not in 
 		    (select fileid from filetag))
 		and id not in (select fileid from descr)});
+	$self->parse_rules;
 	$self->db->disconnect;
 }
 1;

@@ -126,7 +126,7 @@ list_tags();
 prepare_completions();
 
 while (defined ($_ = $term->readline('> '))) {
-	if (m/^tag\s.*\sIF\s.*/) {
+	if (m/^\!?tag\s.*\sIF\s.*/) {
 		$db->parse_rule($_);
 	} elsif (m/^(?:add|t|tag)\b\s*(.*)/i) {
 		parse_tags($1, 
@@ -169,8 +169,12 @@ while (defined ($_ = $term->readline('> '))) {
 			say "Error: rename oldtag newtag";
 		}
 		prepare_completions();
-	} elsif (m/^descr\s*/) {
+	} elsif (m/^descr\s*/i) {
 		edit_description();
+	} elsif (m/^showrules\s*/i) {
+		$db->show_rules();
+	} elsif (m/^rmrule\s+(.*)$/i) {
+		$db->delete_rule($1);
 	} elsif (m/^\s*$/) {
 		# nothing !
 	} else {
