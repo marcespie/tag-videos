@@ -157,7 +157,7 @@ while (defined ($_ = $term->readline('> '))) {
 		}
 		say "known tags: ", join(' ', @tags);
 	} elsif (m/^help\s*/i) {
-		say "help/add/t/rm/rename/list/suggest/descr/known/quit"
+		say "help/add/t/rm/rename/list/suggest/showrules/rmrules/descr/known/quit"
 	} elsif (m/^(?:quit|q)\s*$/i) {
 		$db->cleanup;
 		$term->WriteHistory($history);
