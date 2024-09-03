@@ -22,3 +22,5 @@ For instance, the following will run tag-videos on every stream change if it's n
     end
 
     mp.observe_property("stream-open-filename", "string", on_file_change)
+
+It's probably possible to write a proper luadbi interface to the database, so that the tags could be added as properties on load and shown within mpv's interface.
