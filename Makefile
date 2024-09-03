@@ -22,10 +22,16 @@ install:
 	@${INSTALL_DIR} $(DESTDIR)${LIBDIR}/TagVideos
 	@${INSTALL_DATA} lib/TagVideos/${MODULES} $(DESTDIR)${LIBDIR}/TagVideos
 
+test:
+	@-for i in ${MANS}; do \
+		echo "Testing $$i"; \
+		mandoc -Wall >/dev/null $$i; \
+	done
+
 uninstall:
 	@rm -f $(DESTDIR)${BINDIR}/${BINS}
 	@rm -f $(DESTDIR)${MAN1DIR}/${MANS}
 	@rm -f $(DESTDIR)${LIBDIR}/TagVideos/${MODULES}
 	@rmdir $(DESTDIR)${LIBDIR}/TagVideos
 
-.PHONY: install uninstall
+.PHONY: install uninstall test
