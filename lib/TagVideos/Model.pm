@@ -195,17 +195,21 @@ sub delete_rule($self, $partial)
 
 sub parse_rule($self, $rule)
 {
-	my $counter = 0;
-	if ($rule =~ s/^!//) {
-		$self->{writerule}->execute($rule);
-	}
-	if ($rule =~ m/^tag\s+(.*)\s+IF\s+(.*)/) {
+	if ($rule =~ m/^\!?tag\s+(.*)\s+IF\s+(.*)/) {
 		my ($set, $cond) = (lc($1), lc($2));
 		my @tags = split(/\s+/, $cond);
 		my $stmt = $self->insertif(@tags);
 		for my $tag (split(/\s+/, $set)) {
 			$stmt->execute($tag, @tags);
 		}
+	} elsif ($rule =~ m/^\!?rename\s+(\S+)\s+(\S+)\s*$/) {
+		$self->rename_tag(lc($1), lc($2));
+	} else {
+		say "Error: can't parse $rule";
+		return;
+	}
+	if ($rule =~ s/^!//) {
+		$self->{writerule}->execute($rule);
 	}
 }
 
