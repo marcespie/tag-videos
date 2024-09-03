@@ -28,11 +28,11 @@ sub resolve_link($class, $path)
 		if (File::Spec->file_name_is_absolute($p2)) {
 			$path = $p2;
 		} else {
-			$path = Cwd::realpath(File::Spec->rel2abs($p2, 
-			    File::Basename::dirname($path)));
+			$path = File::Spec->rel2abs($p2, 
+			    File::Basename::dirname($path));
 	    	}
 	}
-	return $path;
+	return Cwd::realpath($path);
 }
 
 1;
