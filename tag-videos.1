@@ -87,14 +87,16 @@ Commands are as follows:
 .It Cm add Ar tag ...
 Add
 .Ar tag
-to the current file.
+to the current
+.Ar path .
 .Po
 But see
 .Sx RULES
 below.
 .Pc
 .It Cm descr
-Edit the description for the current file,
+Edit the description for the current
+.Ar path ,
 using ${VISUAL} or ${EDIT} or
 .Xr vi 1 .
 .It Cm help
@@ -104,13 +106,15 @@ Show tags that contain the
 .Ar partial
 string.
 .It Cm list
-Show tags for the current file.
+Show tags for the current
+.Ar path .
 .It Cm quit
 Quit.
 .It Cm rm Ar tag ...
 Remove
 .Ar tag
-from the current file.
+from the current
+.Ar path .
 .It Oo ! Oc Ns Cm rename Ar old Ar new
 Rename tag
 .Ar old
@@ -125,7 +129,9 @@ Show permanent rules associated with the database.
 .It Cm suggest Ar tag ...
 Show other tags that are mentioned with
 .Ar tag ,
-but not yet set on the current file, ordered by frequency.
+but not yet set on the current
+.Ar path ,
+ordered by frequency.
 .It Cm + Ar tag ...
 Synonym for
 .Cm add .
@@ -134,10 +140,12 @@ Synonym for
 .Cm quit .
 .El
 .Pp
-Tags will be lowercased, and there might be restrictions on valid characters.
+Tags will be lowercased, and there might be restrictions on valid characters,
+so it's best to stick with digits, letters and a few symbols 
+like underscore or dash.
 .Pp
 .Nm
-knows about already defined tags, so that completion works in the interface.
+knows about already defined tags, so that tab completion works in the interface.
 .Pp
 Note that tags are committed on the fly: even if you don't quit
 .Nm
