@@ -29,9 +29,9 @@ test:
 	done
 
 uninstall:
-	@rm -f $(DESTDIR)${BINDIR}/${BINS}
-	@rm -f $(DESTDIR)${MAN1DIR}/${MANS}
+	@-cd $(DESTDIR)${BINDIR} && rm -f ${BINS}
+	@-cd $(DESTDIR)${MAN1DIR} && rm -f ${MANS}
 	@rm -f $(DESTDIR)${LIBDIR}/TagVideos/${MODULES}
-	@rmdir $(DESTDIR)${LIBDIR}/TagVideos
+	@-rmdir $(DESTDIR)${LIBDIR}/TagVideos
 
 .PHONY: install uninstall test
