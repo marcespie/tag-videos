@@ -151,8 +151,15 @@ sub insertif($self, @tags)
 		    where tag.tag=?)};
 
 	my @extra = (qq{tag.tag=?});
-	for (@tags) {
-		push(@extra, $subquery);
+	for my $tag (@tags) {
+		my $not = '';
+		if ($tag =~ s/^!//) {
+			$not = " not ";
+
+		push(@extra, 
+		    "file.id $not in (select fileid from filetag 
+		    	join tag on tagid=tag.id
+		    where tag.tag=?)";
 	}
 	my $query =
 		qq{insert into filetag (tagid, fileid) 
