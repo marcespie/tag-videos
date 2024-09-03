@@ -1,0 +1,66 @@
+.\" Copyright (c) 2024 Marc Espie <espie@openbsd.org>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt DISPLAY-VIDEOS-TAGS 1
+.Os
+.Sh NAME
+.Nm display-video-tags
+.Nd display tags for a given video
+.Sh SYNOPSIS
+.Nm display-video-tags
+.Op Fl d Ar database
+.Ar path
+.Sh DESCRIPTION
+Show tags associated to a given
+.Ar path .
+.Pp
+.Nm
+is intended as a helper command for an
+.Xr mpv 1 Ns 's 
+lua script:
+.Bd -literal -offset indent
+function on_file_change(name, value)
+    if value ~= nil then
+	mp.commandv("run", "display-video-tags", tostring(value))
+    end
+end
+mp.observe_property("stream-open-filename", "string", on_file_change)
+.Ed
+.Pp
+.Nm
+takes the following option:
+.Bl -tag -width data
+.It Fl d Ar database
+Select another database instead of the default
+.Pa $HOME/videos_tags .
+.El
+.Sh ENVIRONMENT
+.Bl -tag -width DBPATH
+.It Ev DBPATH
+Path to the database instead of the default
+.Pa $HOME/video_tags
+.El
+.Sh FILES
+.Bl -tag -width DBPATH
+.It Pa $HOME/videos_tags
+Default path to the
+.Xr sqlite3 1
+database .
+.El
+.Sh SEE ALSO
+.Xr sqlite3 1 ,
+.Xr tag-videos 1
+.Sh AUTHORS
+.An Marc Espie
