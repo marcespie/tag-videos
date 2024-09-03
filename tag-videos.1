@@ -24,6 +24,7 @@
 .Op Fl c Ar cwd
 .Op Fl d Ar database
 .Op Fl h Ar history
+.Op Fl t Ar tty
 .Ar path
 .Sh DESCRIPTION
 .Nm
@@ -61,6 +62,16 @@ file instead of the default
 Don't resolve symlinks to absolute paths.
 .It Fl q
 Quit if tags are already defined.
+.It Fl t Ar tty
+Interact with the named
+.Ar tty
+instead of the current window.
+This can be useful to have a permanent terminal in which to edit tags.
+.Pp
+.Sy Warning:
+be sure to exit
+.Nm
+before you start another.
 .El
 .Pp
 This will open an interactive terminal with a few commands you can use

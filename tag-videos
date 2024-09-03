@@ -30,8 +30,9 @@ use TagVideos::Path;
 use locale;
 my $opts = {};
 
-if (!getopts('qc:d:LH:', $opts) || @ARGV != 1) {
-	say STDERR "Usage: $0 [-Lq] [-c cwd] [-d database] [-H history] path";
+if (!getopts('qc:d:LH:t:', $opts) || @ARGV != 1) {
+	TagVideos::Base->usage("[-Lq]", "[-c cwd]", "[-d database]",
+		"[-H history]", "[-t tty]", "path");
 	exit 1;
 }
 
@@ -43,12 +44,25 @@ if (!$opts->{L}) {
 	$path = TagVideos::Path->resolve_link($path);
 }
 
+my ($in, $out) = (\*STDIN, \*STDOUT);
+
+if ($opts->{t}) {
+	open(my $tty, "+<", $opts->{t}) or die;
+	if (!-t $tty) {
+		say STDERR "$opts->{t} is not a tty";
+		exit 1;
+	}
+	select($tty);
+	($in, $out) = ($tty, $tty);
+}
+
+
 say "Filename is: $path";
 
 my $db = TagVideos::Model->connect($opts->{d});
 $db->set_path($path);
 
-my $term = Term::ReadLine->new("tag-videos");
+my $term = Term::ReadLine->new("tag-videos", $in, $out);
 my $attribs = $term->Attribs;
 $attribs->{completion_entry_function} = $attribs->{list_completion_function};
 

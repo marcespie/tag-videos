@@ -57,6 +57,13 @@ sub create($class, $p)
 	}
 }
 
+sub usage($class, @text)
+{
+	my $cmd = $0;
+	$cmd =~ s,.*/,,;
+	say STDERR "Usage: $cmd ".join(' ', @text);
+}
+
 1;
 __DATA__
 -- XXX maybe it would be better to have a directory/file separation
