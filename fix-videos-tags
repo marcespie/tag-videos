@@ -60,7 +60,7 @@ $query->execute;
 while ($query->fetch) {
 	my $p2 = TagVideos::Path->resolve_link($path);
 	if ($p2 ne $path) {
-		say "$path -> $p2" if $opts->{v}
+		say "$path -> $p2" if $opts->{v};
 		$check->execute($p2);
 		if ($check->fetch) {
 			say "both exist, fixing tags" if $opts->{v};
@@ -70,9 +70,10 @@ while ($query->fetch) {
 			$rmtag->execute($id);
 			$rmid->execute($id);
 		} else {
-			say "updating path" if $opts->{v}
+			say "updating path" if $opts->{v};
 			$fixup_path->execute($p2, $id);
 		}
+		while ($check->fetch) {}
 	}
 }
 $db->disconnect;
