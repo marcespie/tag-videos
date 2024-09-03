@@ -15,10 +15,11 @@ It's also possible to create simple lua scripts
 For instance, the following will run tag-videos on every new stream if it's not been tagged already, while showing existing tags.
 
     function on_file_change(name, value)
-       if value ~= nil then
-	      mp.commandv("run", "display-videos-tags", tostring(value))
-		     mp.commandv("run", "xterm", "-geometry", "+0+0", "-e", "tag-videos", "-q", tostring(value))
-			end
-			end
-			mp.observe_property("stream-open-filename", "string", on_file_change)
+	if value ~= nil then
+	    mp.commandv("run", "display-videos-tags", tostring(value))
+	    mp.commandv("run", "xterm", "-geometry", "+0+0", "-e", "tag-videos", "-q", tostring(value))
+	end
+    end
+
+    mp.observe_property("stream-open-filename", "string", on_file_change)
 
