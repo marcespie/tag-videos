@@ -19,16 +19,18 @@
 .Nm fix-videos-tags
 .Nd resolve symlinks in a video-tags(1) database
 .Sh SYNOPSIS
-.Nm fix-filenames
+.Nm
 .Op Fl v
 .Op Fl d Ar database
 .Sh DESCRIPTION
 By default,
 .Xr videos-tags 1
-now resolves symlinks to absolute names.
+resolves symlinks to absolute names.
 .Pp
 .Nm
-can fix an existing database by resolving symlinks after the fact
+can 
+.Dq fix 
+an existing database by resolving symlinks after the fact
 and collapsing aliases to the same file.
 .Pp
 .Nm
