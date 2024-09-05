@@ -29,26 +29,20 @@ use TagVideos::Path;
 
 use locale;
 
-my @saveargs = @ARGV;
-
-my ($quick, $cwd, $dbpath, $opt_L, $history, $ttyname, $stop, @external);
+my ($quick, $cwd, $dbpath, $opt_L, $history, $ttyname, @external);
 
 if (!GetOptions(
     q => \$quick,
-    c => \$cwd,
-    d => \$dbpath,
+    'c=s' => \$cwd,
+    'd=s' => \$dbpath,
     L => \$opt_L,
-    H => \$history,
-    t => \$ttyname,
-    s => \$stop,
+    'H=s' => \$history,
+    't=s' => \$ttyname,
     'x=s' => \@external) || @ARGV !=1 ) {
 	TagVideos::Base->usage("[-Lq]", "[-c cwd]", "[-d database]",
 		"[-H history]", "[-t tty]", "[-x cmd...]", "path");
 	exit 1;
 }
-
-# XXX
-@external = () if $stop;
 
 # as it stands the script gets two parameters: cwd + path name
 
@@ -152,8 +146,18 @@ if (defined $descr) {
 
 list_tags($quick);
 if (@external) {
-	push(@external, $0, "-s");
-	push(@external, @saveargs);
+	push(@external, $0);
+	if (defined $cwd) {
+		push(@external, '-c', $cwd);
+	}
+	if (defined $opt_L) {
+		push(@external, '-L');
+	}
+	push(@external, '-H', $history);
+	if (defined $ttyname) {
+		push(@external, '-t', $ttyname);
+	}
+	push(@external, @ARGV);
 	exec {$external[0]} @external;
 }
 
