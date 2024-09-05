@@ -32,7 +32,7 @@ sub resolve_link($class, $path)
 			    File::Basename::dirname($path));
 	    	}
 	}
-	return Cwd::realpath($path);
+	return Cwd::realpath($path) // $path;
 }
 
 1;
