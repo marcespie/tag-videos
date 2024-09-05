@@ -20,7 +20,7 @@ use v5.36;
 use Term::ReadLine;
 use Data::Dumper;
 use FindBin;
-use Getopt::Std;
+use Getopt::Long qw(:config bundling require_order);
 use File::Spec;
 use File::Temp;
 use lib "$FindBin::Bin/lib";
@@ -28,28 +28,42 @@ use TagVideos::Model;
 use TagVideos::Path;
 
 use locale;
-my $opts = {};
 
-if (!getopts('qc:d:LH:t:', $opts) || @ARGV != 1) {
+my @saveargs = @ARGV;
+
+my ($quick, $cwd, $dbpath, $opt_L, $history, $ttyname, $stop, @external);
+
+if (!GetOptions(
+    q => \$quick,
+    c => \$cwd,
+    d => \$dbpath,
+    L => \$opt_L,
+    H => \$history,
+    t => \$ttyname,
+    s => \$stop,
+    'x=s' => \@external) || @ARGV !=1 ) {
 	TagVideos::Base->usage("[-Lq]", "[-c cwd]", "[-d database]",
-		"[-H history]", "[-t tty]", "path");
+		"[-H history]", "[-t tty]", "[-x cmd...]", "path");
 	exit 1;
 }
 
+# XXX
+@external = () if $stop;
+
 # as it stands the script gets two parameters: cwd + path name
 
-my $path = File::Spec->rel2abs($ARGV[0], $opts->{c});
+my $path = File::Spec->rel2abs($ARGV[0], $cwd);
 
-if (!$opts->{L}) {
+if (!$opt_L) {
 	$path = TagVideos::Path->resolve_link($path);
 }
 
 my ($in, $out) = (\*STDIN, \*STDOUT);
 
-if ($opts->{t}) {
-	open(my $tty, "+<", $opts->{t}) or die;
+if (defined $ttyname) {
+	open(my $tty, "+<", $ttyname) or die;
 	if (!-t $tty) {
-		say STDERR "$opts->{t} is not a tty";
+		say STDERR "$ttyname is not a tty";
 		exit 1;
 	}
 	select($tty);
@@ -59,14 +73,14 @@ if ($opts->{t}) {
 
 say "Filename is: $path";
 
-my $db = TagVideos::Model->connect($opts->{d});
+my $db = TagVideos::Model->connect($dbpath);
 $db->set_path($path);
 
 my $term = Term::ReadLine->new("tag-videos", $in, $out);
 my $attribs = $term->Attribs;
 $attribs->{completion_entry_function} = $attribs->{list_completion_function};
 
-my $history = $opts->{h} // $ENV{HOME}."/.tag-videos-history";
+$history //= $ENV{HOME}."/.tag-videos-history";
 
 if (-f $history) {
 	$term->ReadHistory($history);
@@ -136,7 +150,13 @@ if (defined $descr) {
 	say $descr;
 }
 
-list_tags($opts->{q});
+list_tags($quick);
+if (@external) {
+	push(@external, $0, "-s");
+	push(@external, @saveargs);
+	exec {$external[0]} @external;
+}
+
 prepare_completions();
 
 while (defined ($_ = $term->readline('> '))) {
