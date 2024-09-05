@@ -25,6 +25,7 @@
 .Op Fl d Ar database
 .Op Fl h Ar history
 .Op Fl t Ar tty
+.Op Fl x Ar cmd ...
 .Ar path
 .Sh DESCRIPTION
 .Nm
@@ -73,6 +74,13 @@ This can be useful to have a permanent terminal in which to edit tags.
 be sure to exit
 .Nm
 before you start another.
+.It Fl x Ar cmd ...
+Rerun
+.Nm
+inside an external program after handling
+.Fl q ,
+for instance:
+.Li Nm Fl q Fl x xterm Fl x Fl e Ar path
 .El
 .Pp
 This will open an interactive terminal with a few commands you can use
@@ -141,7 +149,7 @@ Synonym for
 .El
 .Pp
 Tags will be lowercased, and there might be restrictions on valid characters,
-so it's best to stick with digits, letters and a few symbols 
+so it's best to stick with digits, letters and a few symbols
 like underscore or dash.
 .Pp
 .Nm
