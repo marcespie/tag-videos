@@ -147,7 +147,7 @@ sub set_descr($self, $descr)
 	$self->{setdescr}->execute($descr, $self->{id});
 }
 
-sub insertif($self, @tags)
+sub insertif($self, $not, @tags)
 {
 	my $subquery =
 	    qq{file.id in (select fileid from filetag join tag on tagid=tag.id
@@ -198,9 +198,14 @@ sub parse_rule($self, $rule)
 	if ($rule =~ m/^\!?tag\s+(.*)\s+IF\s+(.*)/) {
 		my ($set, $cond) = (lc($1), lc($2));
 		my @tags = split(/\s+/, $cond);
-		my $stmt = $self->insertif(@tags);
+		my $stmt = $self->insertif(0, @tags);
+		my $not_stmt = $self->insertif(1, @tags);
 		for my $tag (split(/\s+/, $set)) {
-			$stmt->execute($tag, @tags);
+			if ($tag =~ s/^\!//) {
+				$not_stmt->execute($tag, @tags);
+			} else {
+				$stmt->execute($tag, @tags);
+			}
 		}
 	} elsif ($rule =~ m/^\!?rename\s+(\S+)\s+(\S+)\s*$/) {
 		$self->rename_tag(lc($1), lc($2));
