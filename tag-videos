@@ -38,9 +38,12 @@ if (!GetOptions(
     L => \$opt_L,
     'H=s' => \$history,
     't=s' => \$ttyname,
+    'X=s' => sub($X, $value) {
+    	push(@external, split(/\,/, $value));
+	},
     'x=s' => \@external) || @ARGV !=1 ) {
 	TagVideos::Base->usage("[-Lq]", "[-c cwd]", "[-d database]",
-		"[-H history]", "[-t tty]", "[-x cmd...]", "path");
+		"[-H history]", "[-t tty]", "[-[x|X] cmd...]", "path");
 	exit 1;
 }
 

@@ -80,7 +80,19 @@ Rerun
 inside an external program after handling
 .Fl q ,
 for instance:
-.Li Nm Fl q Fl x xterm Fl x Fl e Ar path
+.It Fl X Ar cmd ...
+Rerun
+.Nm
+inside an external program after handling
+.Fl q ,
+for instance:
+.Li Nm Fl q Fl X xterm,-geometry,+0+0,-e Ar path
+.Pp
+Contrary to
+.Fl x ,
+one single
+.Ar cmd
+can usually be passed, because it will be split into words on commas.
 .El
 .Pp
 This will open an interactive terminal with a few commands you can use
