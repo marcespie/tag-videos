@@ -32,12 +32,11 @@ is intended as a helper command for an
 .Xr mpv 1 Ns 's
 lua script:
 .Bd -literal -offset indent
-function on_file_change(name, value)
-    if value ~= nil then
-	mp.commandv("run", "display-video-tags", tostring(value))
-    end
+function display_tags()
+    p = mp.get_property("path", "string")
+    mp.commandv("run", "display-video-tags", p)
 end
-mp.observe_property("stream-open-filename", "string", on_file_change)
+mp.register_event("file_loaded", display_tags)
 .Ed
 .Pp
 .Nm
