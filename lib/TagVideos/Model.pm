@@ -45,8 +45,15 @@ my $requests = {
 		    and tag.id not in 
 			(select tagid from filetag where fileid=?)
 		group by tag.tag},
-	renametag =>
-	    qq{update tag set tag=? where tag=?},
+	addnewtag =>
+	    qq{insert into filetag (tagid, fileid)
+	    	select t1.id,filetag.fileid from filetag 
+		    join tag t1 
+		    join tag t2 on t2.id=filetag.tagid
+		    where t1.tag=? and t2.tag=?},
+	deleteoldtag =>
+	    qq{delete from filetag where
+		tagid=(select id from tag where tag=?)},
 	readdescr =>
 	    qq{select descr from descr where fileid=?},
 	setdescr =>
@@ -128,7 +135,9 @@ sub suggestions($self, $tag)
 
 sub rename_tag($self, $old, $new)
 {
-	$self->{renametag}->execute($new, $old);
+	$self->{createtag}->execute($new);
+	$self->{addnewtag}->execute($new, $old);
+	$self->{deleteoldtag}->execute($old);
 }
 
 sub read_descr($self)
@@ -220,6 +229,7 @@ sub parse_rule($self, $rule)
 
 sub cleanup($self)
 {
+	$self->parse_rules;
 	$self->db->do(
 	    qq{delete from tag where id in 
 	    	(select id from tag where tag.id not in 
@@ -229,7 +239,6 @@ sub cleanup($self)
 	    	(select id from file where file.id not in 
 		    (select fileid from filetag))
 		and id not in (select fileid from descr)});
-	$self->parse_rules;
 	$self->db->disconnect;
 }
 1;
