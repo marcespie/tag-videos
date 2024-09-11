@@ -14,13 +14,10 @@ input, one per line.
 It's also possible to create simple lua scripts
 For instance, the following will run tag-videos on every stream change if it's not been tagged already, while showing existing tags:
 
-    function on_file_change(name, value)
-        if value ~= nil then
-            mp.commandv("run", "display-videos-tags", tostring(value))
-            mp.commandv("run", "xterm", "-geometry", "+0+0", "-e", "tag-videos", "-q", tostring(value))
-        end
+    function display_tags()
+	p = mp.get_property("path", "string")
+	mp.commandv("run", "tag-videos", "-q", "-X", "xterm,-geometry,+0+0,-e", p)
     end
-
-    mp.observe_property("stream-open-filename", "string", on_file_change)
+    mp.register_event("file_loaded", display_tags)
 
 It's probably possible to write a proper luadbi interface to the database, so that the tags could be added as properties on load and shown within mpv's interface.

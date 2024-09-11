@@ -23,9 +23,9 @@ install:
 	@${INSTALL_DATA} lib/TagVideos/${MODULES} $(DESTDIR)${LIBDIR}/TagVideos
 
 test:
-	@-for i in ${MANS}; do \
+	@for i in ${MANS}; do \
 		echo "Testing $$i"; \
-		mandoc -Wall >/dev/null $$i; \
+		mandoc -Wstyle >/dev/null $$i; \
 	done
 
 uninstall:
