@@ -62,7 +62,9 @@ my $requests = {
 		qq{select rule from rules},
 	writerule =>
 		qq{insert into rules (rule) values (?)},
-	deleterule => qq{delete from rules where rule like '%'||?||'%'}
+	deleterule => qq{delete from rules where rule like '%'||?||'%'},
+	wipetags =>
+	    qq{delete from filetag where fileid=?},
 };
 
 sub connect($class, $database)
@@ -225,6 +227,11 @@ sub parse_rule($self, $rule)
 	if ($rule =~ s/^!//) {
 		$self->{writerule}->execute($rule);
 	}
+}
+
+sub wipe_tags($self)
+{
+	$self->{wipe_tags}->execute($self->id);
 }
 
 sub cleanup($self)
