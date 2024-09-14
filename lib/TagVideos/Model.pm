@@ -231,7 +231,7 @@ sub parse_rule($self, $rule)
 
 sub wipe_tags($self)
 {
-	$self->{wipe_tags}->execute($self->id);
+	$self->{wipetags}->execute($self->id);
 }
 
 sub cleanup($self)
