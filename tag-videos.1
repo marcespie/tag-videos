@@ -26,7 +26,7 @@
 .Op Fl h Ar history
 .Op Fl t Ar tty
 .Op Fl x Ar cmd ...
-.Ar path
+.Op Ar path
 .Sh DESCRIPTION
 .Nm
 is not intended for manual use but rather by adding a line like
@@ -101,6 +101,14 @@ to manipulate tags on your videos.
 All tags are saved in an
 .Xr sqlite3 1
 database encoded as UTF-8 .
+.Pp
+If no
+.Ar path
+argument was passed,
+.Nm
+can still handle global commands to the database, but will
+issue an error message each time a path-dependent command will
+be issued.
 .Pp
 Commands are as follows:
 .Bl -tag -width suggestion -offset indent
