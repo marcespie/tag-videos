@@ -40,7 +40,7 @@ if (!GetOptions(
     'X=s' => sub($X, $value) {
     	push(@external, split(/\,/, $value));
 	},
-    'x=s' => \@external) || @ARGV !=1 ) {
+    'x=s' => \@external) || @ARGV >1 ) {
 	TagVideos::Base->usage("[-Lq]", "[-c cwd]", "[-d database]",
 		"[-H history]", "[-t tty]", "[-[x|X] cmd...]", "path");
 	exit 1;
@@ -48,11 +48,7 @@ if (!GetOptions(
 
 # as it stands the script gets two parameters: cwd + path name
 
-my $path = File::Spec->rel2abs($ARGV[0], $cwd);
-
-if (!$opt_L) {
-	$path = TagVideos::Path->resolve_link($path);
-}
+my $path;
 
 my ($in, $out) = (\*STDIN, \*STDOUT);
 
@@ -66,11 +62,26 @@ if (defined $ttyname) {
 	($in, $out) = ($tty, $tty);
 }
 
-
-say "Filename is: $path";
-
 my $db = TagVideos::Model->connect($dbpath);
-$db->set_path($path);
+
+if (@ARGV == 1) {
+	$path = File::Spec->rel2abs($ARGV[0], $cwd);
+
+	if (!$opt_L) {
+		$path = TagVideos::Path->resolve_link($path);
+	}
+
+
+	say "Filename is: $path";
+
+	$db->set_path($path);
+	my $descr = $db->read_descr;
+	if (defined $descr) {
+		say "Descr:";
+		say $descr;
+	}
+
+}
 
 my $term = Term::ReadLine->new("tag-videos", $in, $out);
 my $attribs = $term->Attribs;
@@ -140,13 +151,10 @@ sub edit_description()
 }
 
 
-my $descr = $db->read_descr;
-if (defined $descr) {
-	say "Descr:";
-	say $descr;
+if (defined $path) {
+	list_tags($quick);
 }
 
-list_tags($quick);
 if (@external) {
 	push(@external, $0);
 	if (defined $cwd) {

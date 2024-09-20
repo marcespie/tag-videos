@@ -78,6 +78,11 @@ sub connect($class, $database)
 	return $o;
 }
 
+sub nopath($)
+{
+	say STDERR "Error: can't use this command without a path";
+}
+
 sub db($o)
 {
 	return $o->{db};
@@ -108,25 +113,41 @@ sub set_path($self, $path)
 
 sub find_tags($self)
 {
+	if (!defined $self->id) {
+		$self->nopath;
+		return;
+	}
 	return $self->selectcol_arrayref('findtags', $self->id);
 }
 
 sub create_tag($self, $tag)
 {
+	if (!defined $self->id) {
+		$self->nopath;
+		return;
+	}
 	$self->{createtag}->execute($tag);
 	$self->{inserttag}->execute($self->id, $tag);
 }
 
 sub delete_tag($self, $tag)
 {
+	if (!defined $self->id) {
+		$self->nopath;
+		return;
+	}
 	$self->{deletetag}->execute($self->id, $tag);
 }
 
 sub suggestions($self, $tag)
 {
+	if (!defined $self->id) {
+		$self->nopath;
+		return;
+	}
 	my $s = $self->{suggestions};
 	my $h = {};
-	$s->execute($tag, $self->{id});
+	$s->execute($tag, $self->id);
 	my ($t, $count);
 	$s->bind_columns(\($t, $count));
 	while ($s->fetch) {
@@ -144,8 +165,12 @@ sub rename_tag($self, $old, $new)
 
 sub read_descr($self)
 {
+	if (!defined $self->id) {
+		$self->nopath;
+		return;
+	}
 	my $s = $self->{readdescr};
-	$s->execute($self->{id});
+	$s->execute($self->id);
 	my $descr;
 	$s->bind_columns(\($descr));
 	while ($s->fetch) {
@@ -155,7 +180,11 @@ sub read_descr($self)
 
 sub set_descr($self, $descr)
 {
-	$self->{setdescr}->execute($descr, $self->{id});
+	if (!defined $self->id) {
+		$self->nopath;
+		return;
+	}
+	$self->{setdescr}->execute($descr, $self->id);
 }
 
 sub insertif($self, $not, @tags)
@@ -231,6 +260,10 @@ sub parse_rule($self, $rule)
 
 sub wipe_tags($self)
 {
+	if (!defined $self->id) {
+		$self->nopath;
+		return;
+	}
 	$self->{wipetags}->execute($self->id);
 }
 
