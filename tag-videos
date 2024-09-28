@@ -127,6 +127,40 @@ sub pretty_print_suggestions($h)
 	return @l;
 }
 
+sub levenshtein_sort($max, @tags)
+{
+	eval {
+	    require Text::LevenshteinXS;
+	};
+	if ($@) {
+		say STDERR "You must install Text::LevenshteinXS for this function";
+		return;
+	}
+	@tags = sort @tags;
+	my $h = {};
+	while (@tags > 1) {
+		my $word = shift @tags;
+		for my $w (@tags) {
+			my $d = Text::LevenshteinXS::distance($word, $w);
+			$h->{join('/', $word, $w)} = $d;
+		}
+	}
+	my $i = 0;
+	my $maxd;
+	my @values;
+	for my $k (sort {$h->{$a} <=> $h->{$b}} keys %$h) {
+		my $d = $h->{$k};
+		if (defined $maxd && $d > $maxd) {
+			say join(',', sort @values), ":", $maxd;
+			$i += @values;
+			@values = ();
+			return if $i > $max;
+		}
+		$maxd = $d;
+		push(@values, $k);
+    	}
+}
+
 sub edit_description()
 {
 	my $fh = File::Temp->new(
@@ -207,6 +241,11 @@ while (defined ($_ = $term->readline('> '))) {
 			@tags = grep { /\Q$filter\E/ } @tags;
 		}
 		say "known tags: ", join(' ', @tags);
+	} elsif (m/^distance\b\s*(\d+)?$/i) {
+		my $max = $1 // 25;
+		prepare_completions();
+		my @tags = @{$attribs->{completion_word}};
+		levenshtein_sort($max, @tags);
 	} elsif (m/^help\s*/i) {
 		say "help/add/t/rm/rename/list/suggest/showrules/rmrules/descr/known/wipe/quit"
 	} elsif (m/^(?:quit|q)\s*$/i) {
