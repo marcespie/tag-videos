@@ -151,7 +151,7 @@ sub levenshtein_sort($max, @tags)
 	for my $k (sort {$h->{$a} <=> $h->{$b}} keys %$h) {
 		my $d = $h->{$k};
 		if (defined $maxd && $d > $maxd) {
-			say join(',', sort @values), ":", $maxd;
+			say join(', ', sort @values), ": ", $maxd;
 			$i += @values;
 			@values = ();
 			return if $i > $max;
