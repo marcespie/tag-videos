@@ -65,6 +65,11 @@ my $requests = {
 	deleterule => qq{delete from rules where rule like '%'||?||'%'},
 	wipetags =>
 	    qq{delete from filetag where fileid=?},
+	occurrences =>
+	    qq{select tag.tag, count(filetag.id) from tag 
+	    	join filetag on filetag.tagid=tag.id 
+		group by filetag.tagid 
+		order by count(filetag.id), tag.tag},
 };
 
 sub connect($class, $database)
@@ -265,6 +270,21 @@ sub wipe_tags($self)
 		return;
 	}
 	$self->{wipetags}->execute($self->id);
+}
+
+sub occurrences($self, $limit)
+{
+	my $s = $self->{occurrences};
+	$s->execute;
+	my ($tag, $count);
+	$s->bind_columns(\($tag, $count));
+	my @r;
+	while ($s->fetch) {
+		last if $count > $limit;
+		push(@r, [$tag, $count]);
+	}
+	$s->finish;
+	return @r;
 }
 
 sub cleanup($self)
