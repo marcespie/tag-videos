@@ -189,7 +189,7 @@ sub levenshtein_closest($word)
 			last if $d == 1;
 		}
 	}
-	return "$word($min-$dmin)";
+	return "$word($min)";
 }
 
 sub levenshtein_debug($max)

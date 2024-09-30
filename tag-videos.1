@@ -122,6 +122,15 @@ But see
 .Sx RULES
 below.
 .Pc
+.It Cm debug Op Ar n
+Show tags that are used less than
+.Ar n
+times in the database
+.Po Ar n
+defaults to 3
+.Pc .
+Each tag is followed by the closest word according to the Levensthein
+distance.
 .It Cm descr
 Edit the description for the current
 .Ar path ,
