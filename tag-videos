@@ -30,6 +30,7 @@ use locale;
 
 my ($quick, $cwd, $dbpath, $opt_L, $history, $ttyname, @external);
 
+
 if (!GetOptions(
     q => \$quick,
     'c=s' => \$cwd,
@@ -127,15 +128,28 @@ sub pretty_print_suggestions($h)
 	return @l;
 }
 
+sub lazy_levenshtein_load()
+{
+	state $loaded = 0;
+	state $tried = 0;
+	if (!$tried) {
+		eval {
+		    require Text::LevenshteinXS;
+		};
+		if ($@) {
+			say STDERR "You must install Text::LevenshteinXS for this function";
+			$tried = 1;
+		} else {
+			$loaded = 1;
+		}
+	}
+	$tried = 1;
+	return $loaded;
+}
+
 sub levenshtein_sort($max, @tags)
 {
-	eval {
-	    require Text::LevenshteinXS;
-	};
-	if ($@) {
-		say STDERR "You must install Text::LevenshteinXS for this function";
-		return;
-	}
+	return unless lazy_levenshtein_load();
 	@tags = sort @tags;
 	my $h = {};
 	while (@tags > 1) {
@@ -159,6 +173,35 @@ sub levenshtein_sort($max, @tags)
 		$maxd = $d;
 		push(@values, $k);
     	}
+}
+
+sub levenshtein_closest($word)
+{
+	return $word unless lazy_levenshtein_load();
+	my @tags = @{$attribs->{completion_word}};
+	my $dmin;
+	my $min;
+	for my $w (@tags) {
+		my $d = Text::LevenshteinXS::distance($word, $w);
+		if ($d > 0 && (defined $dmin && $d < $dmin || !defined $dmin)) {
+			$dmin = $d;
+			$min = $w;
+			last if $d == 1;
+		}
+	}
+	return "$word($min-$dmin)";
+}
+
+sub levenshtein_debug($max)
+{
+	prepare_completions();
+	my @r = $db->occurrences($max);
+	my $i = 0;
+	for my $e (@r) {
+		next if !defined $e;
+		say $i, ":", join(' ', map {levenshtein_closest($_)} @$e);
+		$i++;
+	}
 }
 
 sub edit_description()
@@ -248,10 +291,7 @@ while (defined ($_ = $term->readline('> '))) {
 		levenshtein_sort($max, @tags);
 	} elsif (m/^debug\b\s*(\d+)?$/i) {
 		my $max = $1 // 3;
-		my @r = $db->occurrences($max);
-		for my $e (@r) {
-			print $e->[0], ":", $e->[1], "\n";
-		}
+		levenshtein_debug($max);
 	} elsif (m/^help\s*/i) {
 		say "help/add/t/rm/rename/list/suggest/showrules/rmrules/descr/known/wipe/quit"
 	} elsif (m/^(?:quit|q)\s*$/i) {

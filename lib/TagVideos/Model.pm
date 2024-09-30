@@ -281,7 +281,7 @@ sub occurrences($self, $limit)
 	my @r;
 	while ($s->fetch) {
 		last if $count > $limit;
-		push(@r, [$tag, $count]);
+		push(@{$r[$count]}, $tag);
 	}
 	$s->finish;
 	return @r;
