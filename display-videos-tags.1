@@ -20,7 +20,7 @@
 .Nd display tags for a given video
 .Sh SYNOPSIS
 .Nm
-.Op Fl L
+.Op Fl Ll
 .Op Fl d Ar database
 .Ar path
 .Sh DESCRIPTION
@@ -44,6 +44,10 @@ takes the following options:
 .Bl -tag -width data
 .It Fl L
 Don't resolve symlinks to absolute paths.
+.It Fl l
+Look up for a local database, namely
+.Pa video_tags
+in the current directory, this supersedes env variable.
 .It Fl d Ar database
 Select another database instead of the default
 .Pa $HOME/videos_tags .

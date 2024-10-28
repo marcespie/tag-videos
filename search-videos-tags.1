@@ -20,6 +20,7 @@
 .Nd extract paths that contain some tags from the database
 .Sh SYNOPSIS
 .Nm
+.Op Fl l
 .Op Fl d Ar database
 .Op Fl D Oo ! Oc Ns Ar descr
 .Oo ! Oc Ns Ar tag ...
@@ -41,6 +42,10 @@ Select another database instead of the default
 .Pa $HOME/videos_tags .
 .It Fl D Oo ! Oc Ns Ar descr
 Filter by description.
+.It Fl l
+Look up for a local database, namely
+.Pa video_tags
+in the current directory, this supersedes env variable.
 .El
 .Sh ENVIRONMENT
 .Bl -tag -width DBPATH

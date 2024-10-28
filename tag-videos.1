@@ -20,7 +20,7 @@
 .Nd interactive tag manager for use with mpv
 .Sh SYNOPSIS
 .Nm
-.Op Fl Lq
+.Op Fl Llq
 .Op Fl c Ar cwd
 .Op Fl d Ar database
 .Op Fl h Ar history
@@ -61,6 +61,10 @@ file instead of the default
 .Pa $HOME/.tag-videos-history .
 .It Fl L
 Don't resolve symlinks to absolute paths.
+.It Fl l
+Look up for a local database, namely
+.Pa video_tags
+in the current directory, this supersedes env variable.
 .It Fl q
 Quit if some tags are already defined for the given
 .Ar path .
