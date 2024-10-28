@@ -23,11 +23,16 @@ use locale;
 
 my $opts = {};
 
-if (!getopts('d:D:', $opts) || (@ARGV == 0 && !$opts->{D})) {
-	TagVideos::Base->usage("[-d database] [-D descr] [!]tag ...");
+if (!getopts('d:D:l', $opts) || (@ARGV == 0 && !$opts->{D})) {
+	TagVideos::Base->usage("[-d database] [-D descr] [-l] [!]tag ...");
 }
 
-my $db = TagVideos::Base->connect($opts->{d}, {ReadOnly => 1});
+my $dbpath = $opts->{d};
+if ($opts->{l} && -r 'video_tags') {
+	$dbpath //= 'video_tags';
+}
+
+my $db = TagVideos::Base->connect($dbpath, {ReadOnly => 1});
 
 my $query = qq{
 	select distinct path from file 

@@ -28,13 +28,14 @@ use TagVideos::Path;
 
 use locale;
 
-my ($quick, $cwd, $dbpath, $opt_L, $history, $ttyname, @external);
+my ($quick, $cwd, $dbpath, $opt_L, $opt_l, $history, $ttyname, @external);
 
 
 if (!GetOptions(
     q => \$quick,
     'c=s' => \$cwd,
     'd=s' => \$dbpath,
+    'l' => \$opt_l,
     L => \$opt_L,
     'H=s' => \$history,
     't=s' => \$ttyname,
@@ -42,7 +43,7 @@ if (!GetOptions(
     	push(@external, split(/\,/, $value));
 	},
     'x=s' => \@external) || @ARGV >1 ) {
-	TagVideos::Base->usage("[-Lq]", "[-c cwd]", "[-d database]",
+	TagVideos::Base->usage("[-Llq]", "[-c cwd]", "[-d database]",
 		"[-H history]", "[-t tty]", "[-[x|X] cmd...]", "path");
 	exit 1;
 }
@@ -50,6 +51,10 @@ if (!GetOptions(
 # as it stands the script gets two parameters: cwd + path name
 
 my $path;
+
+if ($opt_l && -r 'video_tags') {
+	$dbpath //= 'video_tags';
+}
 
 my ($in, $out) = (\*STDIN, \*STDOUT);
 

@@ -24,11 +24,16 @@ use locale;
 
 my $opts = {};
 
-if (!getopts('d:L', $opts) || @ARGV != 1) {
-	TagVideos::Base->usage("[-L] [-d database ] filename");
+if (!getopts('d:Ll', $opts) || @ARGV != 1) {
+	TagVideos::Base->usage("[-Ll] [-d database ] filename");
 }
 
-my $db = TagVideos::Base->connect($opts->{d}, {ReadOnly => 1});
+my $dbpath = $opts->{d};
+if ($opts->{l} && -r 'video_tags') {
+	$dbpath //= 'video_tags';
+}
+
+my $db = TagVideos::Base->connect($dbpath, {ReadOnly => 1});
 
 my $query = $db->prepare(qq{
 	select tag from _filetag where path=? order by tag;});
