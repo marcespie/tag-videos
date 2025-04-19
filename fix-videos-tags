@@ -57,6 +57,12 @@ $query->execute;
 
 
 while ($query->fetch) {
+	if (!-e $path) {
+		say "non existent $path" if $opts->{v};
+		$rmtag->execute($id);
+		$rmid->execute($id);
+		next;
+	}
 	my $p2 = TagVideos::Path->resolve_link($path);
 	if ($p2 ne $path) {
 		say "$path -> $p2" if $opts->{v};
