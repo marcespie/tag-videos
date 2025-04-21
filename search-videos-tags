@@ -23,7 +23,7 @@ use locale;
 
 my $opts = {};
 
-if (!getopts('d:D:l', $opts) || (@ARGV == 0 && !$opts->{D})) {
+if (!getopts('d:D:l', $opts)) {
 	TagVideos::Base->usage("[-d database] [-D descr] [-l] [!]tag ...");
 }
 
@@ -45,7 +45,7 @@ my $test = $db->prepare(qq{
 	select distinct 1 from filetag
 		join tag on tag.id=filetag.tagid
 		where tag=?});
-my @extra;
+my @extra = (1);
 for my $i (@ARGV) {
 	my $not = '';
 	if ($i =~ s/^!//) {
