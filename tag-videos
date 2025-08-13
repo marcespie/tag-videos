@@ -25,6 +25,8 @@ use File::Temp;
 use lib "$FindBin::Bin/lib";
 use TagVideos::Model;
 use TagVideos::Path;
+use File::Copy qw();
+use File::Basename qw();
 
 use locale;
 
@@ -152,7 +154,7 @@ sub lazy_levenshtein_load()
 	return $loaded;
 }
 
-sub levenshtein_sort($max, @tags)
+sub levenshtein_sort($max, $amortized, @tags)
 {
 	return unless lazy_levenshtein_load();
 	@tags = sort @tags;
@@ -161,6 +163,9 @@ sub levenshtein_sort($max, @tags)
 		my $word = shift @tags;
 		for my $w (@tags) {
 			my $d = Text::LevenshteinXS::distance($word, $w);
+			if ($amortized) {
+				$d = $d / log(length($word)+ length($w));
+			}
 			$h->{join('/', $word, $w)} = $d;
 		}
 	}
@@ -281,6 +286,18 @@ while (defined ($_ = $term->readline('> '))) {
 		    });
 	} elsif (m/^list\s*$/i) {
 		list_tags();
+	} elsif (m/^move\b\s+(.*)$/i) {
+		my $newname = $1;
+		if (File::Copy::move($path, $newname)) {
+			if (-d $newname) {
+				$newname = File::Spec->catfile($newname,
+				    File::Basename::basename($path));
+			}
+			$newname = File::Spec->rel2abs($newname, $cwd);
+			if (!$opt_L) {
+				$newname = TagVideos::Path->resolve_link($path);
+			}
+		}
 	} elsif (m/^known\b\s*(.*)$/) {
 		my $filter = $1;
 		prepare_completions();
@@ -293,12 +310,18 @@ while (defined ($_ = $term->readline('> '))) {
 		my $max = $1 // 25;
 		prepare_completions();
 		my @tags = @{$attribs->{completion_word}};
-		levenshtein_sort($max, @tags);
+		levenshtein_sort($max, 0, @tags);
+	} elsif (m/^distancelog\b\s*(\d+)?$/i) {
+		my $max = $1 // 25;
+		prepare_completions();
+		my @tags = @{$attribs->{completion_word}};
+		levenshtein_sort($max, 1, @tags);
 	} elsif (m/^debug\b\s*(\d+)?$/i) {
 		my $max = $1 // 3;
 		levenshtein_debug($max);
-	} elsif (m/^help\s*/i) {
-		say "help/add/t/rm/rename/list/suggest/showrules/rmrules/descr/known/wipe/quit"
+	} elsif (m/^help\s*|^\?\s+$/i) {
+		say "help/add/t/rm/rename/list/suggest/distance/distancelog..."
+		say "showrules/rmrules/descr/known/wipe/quit"
 	} elsif (m/^(?:quit|q)\s*$/i) {
 		$db->cleanup;
 		$term->WriteHistory($history);

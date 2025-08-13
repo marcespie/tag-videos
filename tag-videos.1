@@ -150,6 +150,19 @@ a given max number of pairs.
 Requires the
 .Pa Text::LevenshteinXS
 module to work, and will say so at runtime.
+.It Cm distancelog Op Ar max
+Show pairs of tags, ordered by Levenshtein distance, which makes it much
+easier to spot and correct typos.
+.Pp
+This variation normalizes each distance by dividing it by the log of
+the sum of the lengths of both words.
+.Pp
+This will always show all pairs for a given distance, but you can limit to
+a given max number of pairs.
+.Pp
+Requires the
+.Pa Text::LevenshteinXS
+module to work, and will say so at runtime.
 .It Cm help
 Show a summary of existing commands.
 .It Cm known Op Ar partial
