@@ -180,6 +180,8 @@ Show tags for the current
 .Ar path .
 .It Cm quit
 Quit.
+.It Cm Cm man
+Show this manpage.
 .It Cm rm Ar tag ...
 Remove
 .Ar tag
@@ -194,8 +196,10 @@ into
 Delete permanent rules matching
 .Ar partial
 string .
-.It Cm showrules
-Show permanent rules associated with the database.
+.It Cm showrules Op Ar re
+Show permanent rules associated with the database,
+possibly filted by
+.Ar re .
 .It Cm suggest Ar tag ...
 Show other tags that are mentioned with
 .Ar tag ,

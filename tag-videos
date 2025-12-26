@@ -325,7 +325,8 @@ while (defined ($_ = $term->readline('> '))) {
 		my $max = $1 // 3;
 		levenshtein_debug($max);
 	} elsif (m/^help\s*|^\?\s+$/i) {
-		say "help/add/t/rm/rename/list/suggest/distance/distancelog...";
+		say "help/man/add/t/rm/rename/list";
+		say "suggest/distance/distancelog...";
 		say "showrules/rmrules/descr/known/wipe/quit"
 	} elsif (m/^(?:quit|q)\s*$/i) {
 		$db->cleanup;
@@ -333,12 +334,14 @@ while (defined ($_ = $term->readline('> '))) {
 		exit;
 	} elsif (m/^descr\s*/i) {
 		edit_description();
-	} elsif (m/^showrules\s*/i) {
-		$db->show_rules();
+	} elsif (m/^showrules\s*(.*)/i) {
+		$db->show_rules($1);
 	} elsif (m/^rmrule\s+(.*)$/i) {
 		$db->delete_rule($1);
 	} elsif (m/^wipe\s*$/i) {
 		$db->wipe_tags;
+	} elsif (m/^man\b/) {
+		system {'man'} (qw(man tag-videos));
 	} elsif (m/^\s*$/) {
 		# nothing !
 	} else {

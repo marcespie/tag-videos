@@ -226,9 +226,12 @@ sub parse_rules($self)
 	say "Executed $counter permanent rules" if $counter;
 }
 
-sub show_rules($self)
+sub show_rules($self, $arg)
 {
 	for my $rule (@{$self->selectcol_arrayref('readrule')}) {
+		if ($arg ne '' && $rule !~ m/$arg/) {
+			next;
+		}
 		say $rule;
 	}
 }
