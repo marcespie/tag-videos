@@ -24,8 +24,8 @@ use locale;
 
 my $opts = {};
 
-if (!getopts('d:Ll', $opts) || @ARGV != 1) {
-	TagVideos::Base->usage("[-Ll] [-d database ] filename");
+if (!getopts('vd:Ll', $opts) || @ARGV != 1) {
+	TagVideos::Base->usage("[-Llv] [-d database ] filename");
 }
 
 my $dbpath = $opts->{d};
@@ -49,5 +49,8 @@ $query->bind_columns(\$tag);
 my @tags;
 while ($query->fetch) {
 	push(@tags, $tag);
+}
+if ($opts->{v}) {
+	print "[$path] ";
 }
 say "Tags: ", join(' ', @tags);
