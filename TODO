@@ -2,3 +2,5 @@ would be fun to have
 tag !tag IF conditions
 
 but delete does not match insert into ... select at all
+
+add -D ! to search video-tags, to find videos without any description
