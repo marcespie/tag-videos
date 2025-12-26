@@ -32,11 +32,11 @@ my $db = TagVideos::Base->connect($opts->{d});
 
 if ($opts->{l}) {
 	my $input;
-	if ($opt->{l} eq '-') {
+	if ($opts->{l} eq '-') {
 		$input = \*STDIN;
 	} else {
-		open $input, '<', $opt->{l} or
-		    die "Incorrect input file $opt->{l}: $!";
+		open $input, '<', $opts->{l} or
+		    die "Incorrect input file $opts->{l}: $!";
 	}
 	my $inserter = $db->prepare(qq{
 		insert into file (path) values (?)
