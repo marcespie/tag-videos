@@ -27,3 +27,6 @@ For instance, the following will run tag-videos on every stream change if it's n
     mp.register_event("file_loaded", display_tags)
 
 It's probably possible to write a proper luadbi interface to the database, so that the tags could be added as properties on load and shown within mpv's interface.
+
+As for the base interactive interface, it uses a lot of algorithmic tricks to make sure you don't create crazy similar tags which is often a problem
+with these programs.
