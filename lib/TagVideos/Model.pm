@@ -294,11 +294,6 @@ sub cleanup($self)
 	    qq{delete from tag where id in 
 	    	(select id from tag where tag.id not in 
 		    (select tagid from filetag))});
-	$self->db->do(
-	    qq{delete from file where id in 
-	    	(select id from file where file.id not in 
-		    (select fileid from filetag))
-		and id not in (select fileid from descr)});
 	$self->db->disconnect;
 }
 1;

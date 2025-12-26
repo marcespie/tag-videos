@@ -82,3 +82,10 @@ $stmt->bind_columns(\$path);
 while ($stmt->fetch) {
 	say($path);
 }
+
+__END__
+	$self->db->do(
+	    qq{delete from file where id in 
+	    	(select id from file where file.id not in 
+		    (select fileid from filetag))
+		and id not in (select fileid from descr)});
