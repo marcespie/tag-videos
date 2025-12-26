@@ -20,7 +20,7 @@
 .Nd display tags for a given video
 .Sh SYNOPSIS
 .Nm
-.Op Fl Ll
+.Op Fl Llv
 .Op Fl d Ar database
 .Ar path
 .Sh DESCRIPTION
@@ -51,6 +51,12 @@ in the current directory, this supersedes env variable.
 .It Fl d Ar database
 Select another database instead of the default
 .Pa $HOME/videos_tags .
+.It Fl v
+Resolve link to the
+.Ar path
+and show the 
+.Pa [resolved link]
+before the tags.
 .El
 .Sh ENVIRONMENT
 .Bl -tag -width DBPATH
