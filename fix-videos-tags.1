@@ -20,8 +20,9 @@
 .Nd resolve symlinks in a video-tags(1) database
 .Sh SYNOPSIS
 .Nm
-.Op Fl lv
+.Op Fl v
 .Op Fl d Ar database
+.Op Fl l Ar input
 .Sh DESCRIPTION
 By default,
 .Xr tag-videos 1
@@ -41,9 +42,15 @@ takes the following options:
 .It Fl d Ar database
 Select another database instead of the default
 .Pa $HOME/videos_tags .
-.It Fl l
-First add paths from stdin if they're not already in the database,
+.It Fl l Ar input
+First add paths from file
+.Ar input
+if they're not already in the database,
 after resolving links and ignoring non-existent paths.
+.Pp
+As usual
+.Sq -
+stands for standard input.
 .It Fl v
 Shows what changes are made to the database.
 .El
