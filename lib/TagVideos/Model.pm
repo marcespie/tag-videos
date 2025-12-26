@@ -196,9 +196,9 @@ sub insertif($self, $not, @tags)
 {
 	my $subquery =
 	    qq{file.id in (select fileid from filetag join tag on tagid=tag.id
-		    where tag.tag=?)};
+		    where tag.tag like ?)};
 
-	my @extra = (qq{tag.tag=?});
+	my @extra = (qq{tag.tag like ?});
 	for my $tag (@tags) {
 		my $not = '';
 		if ($tag =~ s/^!//) {
@@ -207,7 +207,7 @@ sub insertif($self, $not, @tags)
 
 		push(@extra, 
 		    "file.id $not in (select fileid from filetag ".
-		    	"join tag on tagid=tag.id where tag.tag=?)");
+			"join tag on tagid=tag.id where tag.tag like ?)");
 	}
 	my $query =
 		qq{insert into filetag (tagid, fileid) 
