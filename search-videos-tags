@@ -21,6 +21,19 @@ use lib "$FindBin::Bin/lib";
 use TagVideos::Base;
 use locale;
 
+sub run($db, $q)
+{
+	my $stmt = $db->prepare($q);
+
+	my $path;
+	$stmt->execute(@ARGV);
+	$stmt->bind_columns(\$path);
+
+	while ($stmt->fetch) {
+		say($path);
+	}
+}
+
 my $opts = {};
 
 if (!getopts('d:D:l', $opts)) {
@@ -41,11 +54,22 @@ my $subquery = qq{
 	select fileid from filetag 
 		join tag on tag.id=filetag.tagid};
 
+my $emptytag = qq{
+	select distinct path from file
+	    where id not in 
+		(select fileid from filetag) order by path};
+
 my $test = $db->prepare(qq{
 	select distinct 1 from filetag
 		join tag on tag.id=filetag.tagid
 		where tag=?});
 my @extra = (1);
+
+if (@ARGV == 1 && $ARGV[0] eq '!') {
+	shift @ARGV;
+	run($db, $emptytag);
+	exit(0);
+}
 for my $i (@ARGV) {
 	my $not = '';
 	if ($i =~ s/^!//) {
@@ -73,19 +97,6 @@ if ($opts->{D}) {
 }
 
 my $fullquery = "$query where ".join(" and ", @extra)." order by path";
-my $stmt = $db->prepare($fullquery);
-
-my $path;
-$stmt->execute(@ARGV);
-$stmt->bind_columns(\$path);
-
-while ($stmt->fetch) {
-	say($path);
-}
+run($db, $fullquery);
 
 __END__
-	$self->db->do(
-	    qq{delete from file where id in 
-	    	(select id from file where file.id not in 
-		    (select fileid from filetag))
-		and id not in (select fileid from descr)});
