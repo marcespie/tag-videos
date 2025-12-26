@@ -20,7 +20,7 @@
 .Nd resolve symlinks in a video-tags(1) database
 .Sh SYNOPSIS
 .Nm
-.Op Fl v
+.Op Fl lv
 .Op Fl d Ar database
 .Sh DESCRIPTION
 By default,
@@ -41,6 +41,9 @@ takes the following options:
 .It Fl d Ar database
 Select another database instead of the default
 .Pa $HOME/videos_tags .
+.It Fl l
+First add paths from stdin if they're not already in the database,
+after resolving links and ignoring non-existent paths.
 .It Fl v
 Shows what changes are made to the database.
 .El

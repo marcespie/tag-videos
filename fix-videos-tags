@@ -24,12 +24,24 @@ use locale;
 
 my $opts = {};
 
-if (!getopts('d:v', $opts) || @ARGV != 0) {
+if (!getopts('d:vl', $opts) || @ARGV != 0) {
 	TagVideos::Base->usage("[-d database]");
 }
 
 my $db = TagVideos::Base->connect($opts->{d});
 
+if ($opts->{l}) {
+	my $inserter = $db->prepare(qq{
+		insert into file (path) values (?)
+		    on conflict do nothing});
+	while (<STDIN>) {
+		chomp;
+		my $p2 = TagVideos::Path->resolve_link($_);
+		if (-e $p2) {
+			$inserter->execute($p2);
+		}
+	}
+}
 
 my $query = $db->prepare(qq{
 	select id, path from file});
@@ -47,6 +59,7 @@ my $rmtag = $db->prepare(qq{
 	delete from filetag where fileid=?});
 my $rmid = $db->prepare(qq{
 	delete from file where id=?});
+
 
 
 my ($id, $id2, $path);
