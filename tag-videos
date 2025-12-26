@@ -30,11 +30,13 @@ use File::Basename qw();
 
 use locale;
 
-my ($quick, $cwd, $dbpath, $opt_L, $opt_l, $history, $ttyname, @external);
+my ($quick, $quick2, $cwd, $dbpath, $opt_L, $opt_l, $history, $ttyname, 
+    @external);
 
 
 if (!GetOptions(
     q => \$quick,
+    Q => \$quick2,
     'c=s' => \$cwd,
     'd=s' => \$dbpath,
     'l' => \$opt_l,
@@ -45,7 +47,7 @@ if (!GetOptions(
     	push(@external, split(/\,/, $value));
 	},
     'x=s' => \@external) || @ARGV >1 ) {
-	TagVideos::Base->usage("[-Llq]", "[-c cwd]", "[-d database]",
+	TagVideos::Base->usage("[-LlqQ]", "[-c cwd]", "[-d database]",
 		"[-H history]", "[-t tty]", "[-[x|X] cmd...]", "path");
 	exit 1;
 }
@@ -56,6 +58,9 @@ my $path;
 
 if ($opt_l && -r 'video_tags') {
 	$dbpath //= 'video_tags';
+}
+if ($quick2) {
+	$quick = 2;
 }
 
 my ($in, $out) = (\*STDIN, \*STDOUT);
@@ -106,7 +111,7 @@ sub list_tags($quit = 0)
 	my $tags = $db->find_tags;
 
 	say "Tags: ", join(' ', @$tags);
-	if ($quit && @$tags >0) {
+	if ($quit && (@$tags > 0 || $quit == 2)) {
 		exit 0;
 	}
 }
@@ -320,7 +325,7 @@ while (defined ($_ = $term->readline('> '))) {
 		my $max = $1 // 3;
 		levenshtein_debug($max);
 	} elsif (m/^help\s*|^\?\s+$/i) {
-		say "help/add/t/rm/rename/list/suggest/distance/distancelog..."
+		say "help/add/t/rm/rename/list/suggest/distance/distancelog...";
 		say "showrules/rmrules/descr/known/wipe/quit"
 	} elsif (m/^(?:quit|q)\s*$/i) {
 		$db->cleanup;
