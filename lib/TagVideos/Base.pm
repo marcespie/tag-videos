@@ -55,6 +55,7 @@ sub create($class, $p)
 	for my $sql (split /;/, <DATA>) {
 		$db->do($sql.';');
 	}
+	return $db;
 }
 
 sub usage($class, @text)
