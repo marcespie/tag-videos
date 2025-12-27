@@ -31,12 +31,13 @@ use File::Basename qw();
 use locale;
 
 my ($quick, $quick2, $cwd, $dbpath, $opt_L, $opt_l, $history, $ttyname, 
-    @external);
+    @external, $smart);
 
 
 if (!GetOptions(
     q => \$quick,
     Q => \$quick2,
+    s => \$smart,
     'c=s' => \$cwd,
     'd=s' => \$dbpath,
     'l' => \$opt_l,
@@ -122,9 +123,22 @@ sub prepare_completions()
 		$db->selectcol_arrayref('alltags');
 }
 
+sub may_alter_tag($tag, $h)
+{
+	if ($h->{$tag}) {
+		say "$tag renamed to $h->{$tag}";
+		return $h->{$tag};
+	}
+	return $tag;
+}
+
 sub parse_tags($words, $f)
 {
+	my $h = $db->renames;
 	for my $tag (split /\s+/, lc($words)) {
+		if ($smart) {
+			$tag = may_alter_tag($tag, $h);
+		}
 		&$f($tag);
 	}
 }
@@ -209,7 +223,6 @@ sub levenshtein_closest($word)
 
 sub levenshtein_debug($max)
 {
-	prepare_completions();
 	my @r = $db->occurrences($max);
 	my $i = 0;
 	for my $e (@r) {
@@ -305,7 +318,6 @@ while (defined ($_ = $term->readline('> '))) {
 		}
 	} elsif (m/^known\b\s*(.*)$/) {
 		my $filter = $1;
-		prepare_completions();
 		my @tags = @{$attribs->{completion_word}};
 		if ($filter ne '') {
 			@tags = grep { /\Q$filter\E/ } @tags;
@@ -313,12 +325,10 @@ while (defined ($_ = $term->readline('> '))) {
 		say "known tags: ", join(' ', @tags);
 	} elsif (m/^distance\b\s*(\d+)?$/i) {
 		my $max = $1 // 25;
-		prepare_completions();
 		my @tags = @{$attribs->{completion_word}};
 		levenshtein_sort($max, 0, @tags);
 	} elsif (m/^distancelog\b\s*(\d+)?$/i) {
 		my $max = $1 // 25;
-		prepare_completions();
 		my @tags = @{$attribs->{completion_word}};
 		levenshtein_sort($max, 1, @tags);
 	} elsif (m/^debug\b\s*(\d+)?$/i) {
@@ -347,4 +357,5 @@ while (defined ($_ = $term->readline('> '))) {
 	} else {
 		say "Unknown command $_";
 	}
+	prepare_completions();
 }

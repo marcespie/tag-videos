@@ -226,6 +226,19 @@ sub parse_rules($self)
 	say "Executed $counter permanent rules" if $counter;
 }
 
+my $rename_re = qr{^\!?rename\s+(\S+)\s+(\S+)\s*$};
+
+sub renames($self)
+{
+	my $h = {};
+	for my $rule (@{$self->selectcol_arrayref('readrule')}) {
+		if ($rule =~ m/$rename_re/) {
+			$h->{lc($1)} = lc($2);
+		}
+	}
+	return $h;
+}
+
 sub show_rules($self, $arg)
 {
 	for my $rule (@{$self->selectcol_arrayref('readrule')}) {
