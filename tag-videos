@@ -164,7 +164,7 @@ sub may_alter_tag($tag, $h, $h2)
 			push(@$count, $k);
 		}
 	}
-	if (@$count >= 2) {
+	if (@$count != 0) {
 		say "$tag appears to be a prefix completion";
 	} else {
 		# okay, let's try levenshtein
@@ -264,10 +264,18 @@ sub levenshtein_best($tag,$h2)
 		my $d = Text::LevenshteinXS::distance($tag, $t);
 		push(@{$buckets->[$d]}, $t);
 	}
+	# let's do the 3 closest buckets by default
+	my $threshold = 3;
+	my $add = 0;
+	my $result = [];
 	for my $i (0 .. @$buckets) {
 		next if !defined $buckets->[$i];
-		return $buckets->[$i];
+		push(@$result, @{$buckets->[$i]});
+		if (++$add >= $threshold) {
+			last;
+		}
 	}
+	return $result;
 }
 
 sub levenshtein_closest($word)
