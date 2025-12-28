@@ -86,6 +86,7 @@ if (@ARGV == 1) {
 	}
 
 
+	say "Database is ", TagVideos::Model->dbpath($dbpath);
 	say "Filename is: $path";
 
 	$db->set_path($path);
