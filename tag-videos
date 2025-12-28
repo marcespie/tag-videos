@@ -123,23 +123,75 @@ sub prepare_completions()
 		$db->selectcol_arrayref('alltags');
 }
 
-sub may_alter_tag($tag, $h)
+sub prompt_ambiguous($list)
 {
+	my $i = 0;
+	for my $e (@$list) {
+		$i++;
+		say sprintf("%3d %s", $i, $e);
+	}
+	say sprintf("%3d %s", 0, "<nothing>");
+	my $choice;
+	do {
+		$choice = $term->readline('# ');
+		chomp $choice;
+		if ($choice !~ m/^\d+$/) {
+			next;
+		}
+		my $j = int($choice);
+		if ($j < 0 || $j > @$list) {
+			next;
+		}
+		if ($j == 0) {
+			return undef;
+		} else {
+			return $list->[$j-1];
+		}
+	} while (1);
+}
+
+sub may_alter_tag($tag, $h, $h2)
+{
+	# maybe there's a rename going on ?
 	if ($h->{$tag}) {
 		say "$tag renamed to $h->{$tag}";
 		return $h->{$tag};
 	}
-	return $tag;
+	# or we're a prefix of existing tags (ambiguous completion)
+	my $count = [];
+	for my $k (keys %$h2) {
+		if ($k =~ m/^\Q$tag\E/) {
+			push(@$count, $k);
+		}
+	}
+	if (@$count >= 2) {
+		say "$tag appears to be a prefix completion";
+	} else {
+		# okay, let's try levenshtein
+		$count = levenshtein_best($tag, $h2);
+		if (defined $count) {
+			say "$tag may be a typo";
+		} else {
+			say "$tag appears to be new";
+			$count = [];
+		}
+	}
+	unshift(@$count, $tag);
+	return prompt_ambiguous($count);
 }
 
 sub parse_tags($words, $f)
 {
-	my $h = $db->renames;
+	my ($h, %tags);
+	if ($smart) {
+		$h = $db->renames;
+		%tags = map {($_,1)} @{$attribs->{completion_word}};
+	}
 	for my $tag (split /\s+/, lc($words)) {
-		if ($smart) {
-			$tag = may_alter_tag($tag, $h);
+		if ($smart && !defined $tags{$tag}) {
+			$tag = may_alter_tag($tag, $h, \%tags);
 		}
-		&$f($tag);
+		&$f($tag) if defined $tag;
 	}
 }
 
@@ -202,6 +254,20 @@ sub levenshtein_sort($max, $amortized, @tags)
 		$maxd = $d;
 		push(@values, $k);
     	}
+}
+
+sub levenshtein_best($tag,$h2)
+{
+	return unless lazy_levenshtein_load();
+	my $buckets = [];
+	for my $t (sort keys %$h2) {
+		my $d = Text::LevenshteinXS::distance($tag, $t);
+		push(@{$buckets->[$d]}, $t);
+	}
+	for my $i (0 .. @$buckets) {
+		next if !defined $buckets->[$i];
+		return $buckets->[$i];
+	}
 }
 
 sub levenshtein_closest($word)
