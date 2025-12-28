@@ -411,7 +411,7 @@ while (defined ($_ = $term->readline('> '))) {
 	} elsif (m/^help\s*|^\?\s+$/i) {
 		say "help/man/add/t/rm/rename/list";
 		say "suggest/distance/distancelog...";
-		say "showrules/rmrules/descr/known/wipe/quit"
+		say "showrules/rmrule/descr/known/wipe/quit"
 	} elsif (m/^(?:quit|q)\s*$/i) {
 		$db->cleanup;
 		$term->WriteHistory($history);
