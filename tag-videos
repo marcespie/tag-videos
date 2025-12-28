@@ -180,7 +180,7 @@ sub may_alter_tag($tag, $h, $h2)
 	return prompt_ambiguous($count);
 }
 
-sub parse_tags($words, $f)
+sub parse_tags($words, $smart, $f)
 {
 	my ($h, %tags);
 	if ($smart) {
@@ -351,18 +351,18 @@ while (defined ($_ = $term->readline('> '))) {
 		$db->parse_rule($_);
 		prepare_completions();
 	} elsif (m/^(?:add|t|tag)\b\s*(.*)/i) {
-		parse_tags($1, 
+		parse_tags($1, $smart,
 		    sub($tag) {
 			$db->create_tag($tag);
 		    });
 		prepare_completions();
 	} elsif (m/^rm\b\s*(.*)/i) {
-		parse_tags($1, 
+		parse_tags($1, 0,
 		    sub($tag) {
 			$db->delete_tag($tag);
 		    });
 	} elsif (m/^suggest\b\s*(.*)/i) {
-		parse_tags($1,
+		parse_tags($1, 0,
 		    sub($tag) {
 			my $tags = $db->suggestions($tag);
 			say "Suggestions: ", 
