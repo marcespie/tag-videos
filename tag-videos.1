@@ -20,7 +20,7 @@
 .Nd interactive tag manager for use with mpv
 .Sh SYNOPSIS
 .Nm
-.Op Fl Llq
+.Op Fl Llqs
 .Op Fl c Ar cwd
 .Op Fl d Ar database
 .Op Fl h Ar history
@@ -70,6 +70,22 @@ Quit after displaying currently known tags.
 .It Fl q
 Quit if some tags are already defined for the given
 .Ar path .
+.It Fl s
+enable smart tag completion.
+.Pp
+Once enough tags have been defined in a database, most
+.Sq new
+tags will be typos or various other errors.
+.Pp
+Most specifically,
+.Nm
+will first run permanent renames, then look for completion prefixes
+and finally look for tags closest according to Levenshtein (if available).
+.Pp
+If the tag is not found after rename, it will always prompt the user for
+a selection of choices, including the tag as entered, or
+.Sq <nothing>
+to just drop that particular entry.
 .It Fl t Ar tty
 Interact with the named
 .Ar tty
