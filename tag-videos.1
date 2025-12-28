@@ -26,6 +26,7 @@
 .Op Fl h Ar history
 .Op Fl t Ar tty
 .Op Fl x Ar cmd ...
+.Op Fl X Ar cmd
 .Op Ar path
 .Sh DESCRIPTION
 .Nm
@@ -133,12 +134,11 @@ If no
 argument was passed,
 .Nm
 can still handle global commands to the database, but will
-issue an error message each time a path-dependent command will
-be issued.
+issue an error message each time a path-dependent command is used.
 .Pp
 Commands are as follows:
 .Bl -tag -width suggestion -offset indent
-.It Cm add Ar tag ...
+.It Cm add Ns | Ns Cm tag Ns | Ns Cm t Ar tag ...
 Add
 .Ar tag
 to the current
@@ -216,6 +216,13 @@ string .
 Show permanent rules associated with the database,
 possibly filted by
 .Ar re .
+.It Cm smart Op Ar num
+Set the number of closest buckets to consider for
+smart levenshtein compression, e.g., if the threshold is 2,
+and the distances go 2, 3, 5, ...
+the candidates will be tags at distance 2 and 3.
+.Pp
+Automatically set smart completion on/off.
 .It Cm suggest Ar tag ...
 Show other tags that are mentioned with
 .Ar tag ,
@@ -304,6 +311,7 @@ Default saved history file.
 .Xr fix-videos-tags 1 ,
 .Xr merge-videos-tags 1 ,
 .Xr search-videos-tags 1 ,
-.Xr sqlite3 1
+.Xr sqlite3 1 ,
+.Xr update-videos-tags-db 1 
 .Sh AUTHORS
 .An Marc Espie

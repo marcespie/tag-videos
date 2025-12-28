@@ -53,6 +53,8 @@ if (!GetOptions(
 	exit 1;
 }
 
+my $smart_threshold = 3;
+
 # as it stands the script gets two parameters: cwd + path name
 
 my $path;
@@ -265,14 +267,12 @@ sub levenshtein_best($tag,$h2)
 		my $d = Text::LevenshteinXS::distance($tag, $t);
 		push(@{$buckets->[$d]}, $t);
 	}
-	# let's do the 3 closest buckets by default
-	my $threshold = 3;
 	my $add = 0;
 	my $result = [];
 	for my $i (0 .. @$buckets) {
 		next if !defined $buckets->[$i];
 		push(@$result, @{$buckets->[$i]});
-		if (++$add >= $threshold) {
+		if (++$add >= $smart_threshold) {
 			last;
 		}
 	}
@@ -379,18 +379,20 @@ while (defined ($_ = $term->readline('> '))) {
 		    });
 	} elsif (m/^list\s*$/i) {
 		list_tags();
-	} elsif (m/^move\b\s+(.*)$/i) {
-		my $newname = $1;
-		if (File::Copy::move($path, $newname)) {
-			if (-d $newname) {
-				$newname = File::Spec->catfile($newname,
-				    File::Basename::basename($path));
-			}
-			$newname = File::Spec->rel2abs($newname, $cwd);
-			if (!$opt_L) {
-				$newname = TagVideos::Path->resolve_link($path);
-			}
-		}
+
+#	} elsif (m/^move\b\s+(.*)$/i) {
+		# XXX this is not finished
+#		my $newname = $1;
+#		if (File::Copy::move($path, $newname)) {
+#			if (-d $newname) {
+#				$newname = File::Spec->catfile($newname,
+#				    File::Basename::basename($path));
+#			}
+#			$newname = File::Spec->rel2abs($newname, $cwd);
+#			if (!$opt_L) {
+#				$newname = TagVideos::Path->resolve_link($path);
+#			}
+#		}
 	} elsif (m/^known\b\s*(.*)$/) {
 		my $filter = $1;
 		my @tags = @{$attribs->{completion_word}};
@@ -409,10 +411,20 @@ while (defined ($_ = $term->readline('> '))) {
 	} elsif (m/^debug\b\s*(\d+)?$/i) {
 		my $max = $1 // 3;
 		levenshtein_debug($max);
+	} elsif (m/^smart\b\s*(\d+)?$/i) {
+		$smart_threshold = $1 || undef;
+		if (defined $smart_threshold) {
+			$smart_threshold = int($smart_threshold);
+			say "$smart_threshold buckets selected";
+			$smart = 1;
+		} else {
+			say "smart completion off";
+			$smart = 0;
+		}
 	} elsif (m/^help\s*|^\?\s+$/i) {
 		say "help/man/add/t/rm/rename/list";
 		say "suggest/distance/distancelog...";
-		say "showrules/rmrule/descr/known/wipe/quit"
+		say "smart/showrules/rmrule/descr/known/wipe/quit"
 	} elsif (m/^(?:quit|q)\s*$/i) {
 		$db->cleanup;
 		$term->WriteHistory($history);
