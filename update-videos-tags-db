@@ -27,9 +27,13 @@ if (@ARGV != 2) {
 my $old = shift;
 my $new = shift;
 
+if (-f $new) {
+	say STDERR "File $new already exists";
+	exit 1;
+}
 my $db = TagVideos::Base->create($new);
 $db->do("ATTACH DATABASE '$old' as old;");
 
 for my $table (qw(file tag descr rules filetag)) {
-	$db->do("INSERT INTO main.$table select * from old.$table");
+	$db->do("INSERT or IGNORE INTO main.$table select * from old.$table");
 }

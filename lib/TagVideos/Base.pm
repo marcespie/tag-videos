@@ -72,16 +72,17 @@ __DATA__
 -- together with a file view ?
 PRAGMA encoding = "UTF-8";
 CREATE TABLE if not exists file 
-	(Id integer primary key, path text unique on conflict ignore);
+	(Id integer primary key, path text not null unique on conflict ignore);
 CREATE TABLE if not exists tag 
-	(Id integer primary key, tag text unique on conflict ignore);
+	(Id integer primary key, tag text not null unique on conflict ignore);
 CREATE TABLE if not exists filetag 
-	(Id integer primary key, FileId integer, TagId integer, 
+	(Id integer primary key, FileId integer not null, 
+	TagId integer not null, 
 	constraint nodups unique (FileId, TagId) on conflict ignore);
 CREATE TABLE if not exists descr
-	(Id integer primary key, FileId integer unique, Descr text);
+	(Id integer primary key, FileId integer unique, Descr text not null);
 CREATE TABLE if not exists rules
-	(Id integer primary key, Rule text unique);
+	(Id integer primary key, Rule text not null unique);
 -- just in case one wants to check
 create view if not exists _filetag as
 	select tag.tag as tag, file.path as path
