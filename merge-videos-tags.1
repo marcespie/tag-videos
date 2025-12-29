@@ -21,6 +21,7 @@
 .Sh SYNOPSIS
 .Nm
 .Op Fl L
+.Op Fl l input
 .Op Fl o Ar output
 .Ar db ...
 .Sh DESCRIPTION
@@ -30,8 +31,17 @@ The output is either specified through
 .Fl o Ar output
 or the last parameter on the command line.
 .Pp
+This command will always recreate the merge database
+from scratch, so the schema is also updated.
 .Fl L
 can be used to avoid resolving all symlinks on the way.
+.Fl l
+can be used to add a list of paths from
+.Ar input .
+.Pp
+As usual
+.Sq -
+stands for standard input.
 .Sh SEE ALSO
 .Xr sqlite3 1 ,
 .Xr tag-videos 1

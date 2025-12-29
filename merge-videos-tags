@@ -54,7 +54,7 @@ if ($opts->{o}) {
 	$output = pop @ARGV;
 }
 
-if (@ARGV == 0 || !defined $output) {
+if (!defined $output) {
 	usage();
 }
 
@@ -92,12 +92,12 @@ if ($opts->{l}) {
 		open $input, '<', $opts->{l} or
 		    die "Incorrect input file $opts->{l}: $!";
 	}
-	my $inserter = $db->prepare(qq{
+	my $inserter = $dbout->prepare(qq{
 		insert into file (path) values (?)
 		    on conflict do nothing});
 	while (<$input>) {
 		chomp;
-		my $p2 = TagVideos::Path->resolve_link($_);
+		my $p2 = resolve_link($_);
 		if (-e $p2) {
 			$inserter->execute($p2);
 		}
