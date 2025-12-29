@@ -17,31 +17,33 @@
 .Os
 .Sh NAME
 .Nm merge-videos-tags
-.Nd merge several tag databases together
+.Nd fix/merge/update videos tags db
 .Sh SYNOPSIS
 .Nm
 .Op Fl L
 .Op Fl l input
-.Op Fl o Ar output
+.Fl o Ar output
 .Ar db ...
 .Sh DESCRIPTION
-Merge several databases together.
+Merge several databases together,
+resolve the symlink paths, and update the database schema.
 .Pp
-The output is either specified through
-.Fl o Ar output
-or the last parameter on the command line.
-.Pp
-This command will always recreate the merge database
+This command will always recreate the merged database
 from scratch, so the schema is also updated.
-.Fl L
-can be used to avoid resolving all symlinks on the way.
-.Fl l
-can be used to add a list of paths from
+Options are as follows
+.Bl -tag -width data
+.It Fl L
+Don't resolve all symlinks on the way.
+.It Fl l Ar input
+Add a list of paths from
 .Ar input .
 .Pp
 As usual
 .Sq -
 stands for standard input.
+.It Fl o Ar output
+Specify the output database.
+.El
 .Sh SEE ALSO
 .Xr sqlite3 1 ,
 .Xr tag-videos 1

@@ -27,7 +27,7 @@ my $opts = {};
 
 sub usage()
 {
-	TagVideos::Base->usage("[-L] [-l input] [-o output] db ...");
+	TagVideos::Base->usage("[-L] [-l input] -o output db ...");
 }
 
 if (!getopts('o:Ll:', $opts) || @ARGV == 0) {
@@ -47,16 +47,12 @@ sub resolve_link($path)
 }
 
 
-my $output;
-if ($opts->{o}) {
-	$output = $opts->{o};
-} else {
-	$output = pop @ARGV;
-}
-
-if (!defined $output) {
+if (!defined $opts->{o}) {
 	usage();
 }
+
+
+my $ouput = $opts->{o};
 
 my (undef, $temp) = tempfile();
 if (!defined $temp) {
