@@ -27,10 +27,10 @@ my $opts = {};
 
 sub usage()
 {
-	TagVideos::Base->usage("[-L] [-o output] db ...");
+	TagVideos::Base->usage("[-L] [-l input] [-o output] db ...");
 }
 
-if (!getopts('o:L', $opts) || @ARGV == 0) {
+if (!getopts('o:Ll:', $opts) || @ARGV == 0) {
 	usage();
 	
 }
@@ -82,6 +82,27 @@ my $adddescr = $dbout->prepare(
 			
 if (-f $output) {
 	unshift(@ARGV, $output);
+}
+
+if ($opts->{l}) {
+	my $input;
+	if ($opts->{l} eq '-') {
+		$input = \*STDIN;
+	} else {
+		open $input, '<', $opts->{l} or
+		    die "Incorrect input file $opts->{l}: $!";
+	}
+	my $inserter = $db->prepare(qq{
+		insert into file (path) values (?)
+		    on conflict do nothing});
+	while (<$input>) {
+		chomp;
+		my $p2 = TagVideos::Path->resolve_link($_);
+		if (-e $p2) {
+			$inserter->execute($p2);
+		}
+	}
+	# XXX rely on GC, since we don't want to close STDIN
 }
 
 for my $i (@ARGV) {
