@@ -1,6 +1,6 @@
 #! /usr/bin/perl
 
-# Copyright (c) 2024 Marc Espie <espie@openbsd.org>
+# Copyright (c) 2024-2025 Marc Espie <espie@openbsd.org>
 # 
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -20,6 +20,8 @@ use Getopt::Std;
 use lib "$FindBin::Bin/lib";
 use TagVideos::Base;
 use TagVideos::Path;
+use File::Temp;
+use File::Copy;
 
 my $opts = {};
 
@@ -56,7 +58,13 @@ if (@ARGV == 0 || !defined $output) {
 	usage();
 }
 
-my $dbout = TagVideos::Base->connect($output, {});
+my (undef, $temp) = tempfile();
+if (!defined $temp) {
+	say STDERR "Couldn't create temp database";
+	exit 1;
+}
+
+my $dbout = TagVideos::Base->create($temp);
 
 my $addtag = $dbout->prepare(
 	qq{insert into tag (tag) values (?);});
@@ -72,6 +80,9 @@ my $adddescr = $dbout->prepare(
 	qq{insert into descr (fileid, descr)
 		values ((select id from file where path=?), ?);});
 			
+if (-f $output) {
+	unshift(@ARGV, $output);
+}
 
 for my $i (@ARGV) {
 	my $db = TagVideos::Base->connect($i, {ReadOnly => 1});
@@ -86,7 +97,9 @@ for my $i (@ARGV) {
 	$getfile->bind_columns(\($path));
 	$getfile->execute;
 	while ($getfile->fetch) {
-		$addfile->execute(resolve_link($path));
+		if (-e $path) {
+			$addfile->execute(resolve_link($path));
+		}
 	}
 	my $gettagfile = $db->prepare(qq{select tag, path from _filetag});
 	$gettagfile->bind_columns(\($tag, $path));
@@ -104,4 +117,5 @@ for my $i (@ARGV) {
 	}
 }
 
-
+$dbout->disconnect;
+File::Copy::move($temp, $output);
