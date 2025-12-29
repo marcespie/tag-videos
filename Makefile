@@ -9,7 +9,7 @@ INSTALL_BIN = install -m 755
 INSTALL_DATA = install -m 644
 
 # with this construction, you can't have a binary without a manpage !
-BINS = tag-videos {display,fix,merge,search}-videos-tags update-videos-tags-db
+BINS = tag-videos {display,merge,search}-videos-tags
 MANS = ${BINS:=.1}
 MODULES = {Base,Model,Path}.pm
 
