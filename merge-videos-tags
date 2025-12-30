@@ -16,7 +16,7 @@
 
 use v5.36;
 use FindBin;
-use Getopt::Std;
+use Getopt::Long qw(:config bundling require_order);
 use lib "$FindBin::Bin/lib";
 use TagVideos::Base;
 use TagVideos::Path;
@@ -30,16 +30,23 @@ sub usage()
 	TagVideos::Base->usage("[-L] [-l input] -o output db ...");
 }
 
-if (!getopts('o:Ll:', $opts) || @ARGV == 0) {
-	usage();
+my ($output, $nolinks, @lists);
+
+if (!GetOptions(
+	'o=s' => \$output,
+	'L' => \$nolinks,
+	'l=s' => sub($X, $value) {
+		push(@lists, $value);
+	}) || @ARGV == 0) {
 	
+	usage();
 }
 
 my $cache = {};
 
 sub resolve_link($path)
 {
-	if (!$opts->{L}) {
+	if ($nolinks) {
 		return $path;
     	}
 	$cache->{$path} //= Tag::Videos::Path->resolve_link($path);
@@ -47,21 +54,24 @@ sub resolve_link($path)
 }
 
 
-if (!defined $opts->{o}) {
+if (!defined $output) {
 	usage();
 }
 
 
-my $ouput = $opts->{o};
-
-my (undef, $temp) = tempfile();
-if (!defined $temp) {
-	say STDERR "Couldn't create temp database";
-	exit 1;
+my ($temp, $real);
+if (-e $output) {
+	(undef, $temp) = tempfile();
+	if (!defined $temp) {
+		say STDERR "Couldn't create temp database";
+		exit 1;
+	}
+	$real = $temp;
+} else {
+	$real = $output;
 }
 
-my $dbout = TagVideos::Base->create($temp);
-
+my $dbout = TagVideos::Base->connect($real);
 my $addtag = $dbout->prepare(
 	qq{insert into tag (tag) values (?);});
 my $addfile = $dbout->prepare(
@@ -80,15 +90,16 @@ if (-f $output) {
 	unshift(@ARGV, $output);
 }
 
-if ($opts->{l}) {
+my $inserter;
+for my $l (@lists) {
 	my $input;
-	if ($opts->{l} eq '-') {
+	if ($l eq '-') {
 		$input = \*STDIN;
 	} else {
-		open $input, '<', $opts->{l} or
-		    die "Incorrect input file $opts->{l}: $!";
+		open $input, '<', $l or
+		    die "Incorrect input file $l: $!";
 	}
-	my $inserter = $dbout->prepare(qq{
+	$inserter //= $dbout->prepare(qq{
 		insert into file (path) values (?)
 		    on conflict do nothing});
 	while (<$input>) {
@@ -135,4 +146,6 @@ for my $i (@ARGV) {
 }
 
 $dbout->disconnect;
-File::Copy::move($temp, $output);
+if (defined $temp) {
+	File::Copy::move($temp, $output);
+}
