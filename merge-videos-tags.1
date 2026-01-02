@@ -22,6 +22,7 @@
 .Nm
 .Op Fl L
 .Op Fl l Ar input
+.Op Fl t Ar tag
 .Fl o Ar output
 .Ar db ...
 .Sh DESCRIPTION
@@ -41,6 +42,11 @@ Add a list of paths from
 As usual
 .Sq -
 stands for standard input.
+.It Fl t Ar tag
+Tag all the paths mentioned in the various
+.Ar input
+with
+.Ar tag .
 .It Fl o Ar output
 Specify the output database.
 .El

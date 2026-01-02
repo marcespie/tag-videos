@@ -27,14 +27,17 @@ my $opts = {};
 
 sub usage()
 {
-	TagVideos::Base->usage("[-L] [-l input] -o output db ...");
+	TagVideos::Base->usage("[-L] [-l input...] [-t tag...] -o output db ...");
 }
 
-my ($output, $nolinks, @lists);
+my ($output, $nolinks, @lists, @tags, @paths);
 
 if (!GetOptions(
 	'o=s' => \$output,
 	'L' => \$nolinks,
+	't=s' => sub($X, $value) {
+		push(@tags, $value);
+	},
 	'l=s' => sub($X, $value) {
 		push(@lists, $value);
 	}) || @ARGV == 0) {
@@ -107,6 +110,7 @@ for my $l (@lists) {
 		my $p2 = resolve_link($_);
 		if (-e $p2) {
 			$inserter->execute($p2);
+			push(@paths, $p2);
 		}
 	}
 	# XXX rely on GC, since we don't want to close STDIN
@@ -142,6 +146,15 @@ for my $i (@ARGV) {
 	$getdescr->execute;
 	while ($getdescr->fetch) {
 		$adddescr->execute(resolve_link($path), $descr);
+	}
+}
+
+if (@tags > 0 && @paths > 0) {
+	for my $t (@tags) {
+		$addtag->execute($t);
+		for my $p (@paths) {
+			$tagfile->execute($p, $t);
+		}
 	}
 }
 
