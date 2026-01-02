@@ -20,7 +20,7 @@
 .Nd extract paths that contain some tags from the database
 .Sh SYNOPSIS
 .Nm
-.Op Fl l
+.Op Fl lIV
 .Op Fl d Ar database
 .Op Fl D Oo ! Oc Ns Ar descr
 .Op Oo ! Oc Ns Ar tag ...
@@ -34,6 +34,8 @@ If a tag doesn't exist verbatim, the parameter will be used as a partial match,
 .Pp
 Prefixing a tag with ! will instead select files that do not match this tag.
 .Pp
+Using a lone ! as a search parameter will show paths that do not have any tags
+defined.
 .Nm
 takes the following options:
 .Bl -tag -width data
@@ -46,6 +48,10 @@ Filter by description.
 Look up for a local database, namely
 .Pa video_tags
 in the current directory, this supersedes env variable.
+.It Fl I
+Exclude paths matching static images and gif-like objects.
+.It Fl V
+Exclude paths matching videos.
 .El
 .Sh ENVIRONMENT
 .Bl -tag -width DBPATH

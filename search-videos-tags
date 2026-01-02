@@ -21,7 +21,7 @@ use lib "$FindBin::Bin/lib";
 use TagVideos::Base;
 use locale;
 
-sub run($db, $q)
+sub run($db, $q, $re)
 {
 	my $stmt = $db->prepare($q);
 
@@ -30,14 +30,17 @@ sub run($db, $q)
 	$stmt->bind_columns(\$path);
 
 	while ($stmt->fetch) {
+		if (defined $re && $path =~ m/$re/) {
+			next;
+		}
 		say($path);
 	}
 }
 
 my $opts = {};
 
-if (!getopts('d:D:l', $opts)) {
-	TagVideos::Base->usage("[-d database] [-D descr] [-l] [!]tag ...");
+if (!getopts('d:D:lIV', $opts)) {
+	TagVideos::Base->usage("[-d database] [-D descr] [-lIV] [!]tag ...");
 }
 
 my $dbpath = $opts->{d};
@@ -65,9 +68,18 @@ my $test = $db->prepare(qq{
 		where tag=?});
 my @extra = (1);
 
+my $re;
+
+if ($opts->{I}) {
+	$re = qr{\.(?:jpe?g|gif|png|webp)$}i;
+} elsif ($opts->{V}) {
+	$re = qr{\.(?:mov|mkv|avi|mp4|mpe?g|flv|wmv|webm|divx|rm|m4v|rmvb)(?:\.part)?$}i;
+}
+
+
 if (@ARGV == 1 && $ARGV[0] eq '!') {
 	shift @ARGV;
-	run($db, $emptytag);
+	run($db, $emptytag, $re);
 	exit(0);
 }
 for my $i (@ARGV) {
@@ -97,6 +109,6 @@ if ($opts->{D}) {
 }
 
 my $fullquery = "$query where ".join(" and ", @extra)." order by path";
-run($db, $fullquery);
+run($db, $fullquery, $re);
 
 __END__
