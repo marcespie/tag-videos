@@ -212,12 +212,12 @@ sub insertif($self, $not, @tags)
 			$not = " not ";
 		}
 
-		push(@extra, 
+		push(@extra,
 		    "file.id $not in (select fileid from filetag ".
 			"join tag on tagid=tag.id where tag.tag like ?)");
 	}
 	my $query =
-		qq{insert into filetag (tagid, fileid) 
+		qq{insert into filetag (tagid, fileid)
 			select tag.id, file.id from tag join file where }
 		.join(' and ', @extra);
 	return $self->db->prepare($query);

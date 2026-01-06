@@ -1,11 +1,11 @@
 #! /usr/bin/perl
 
 # Copyright (c) 2024 Marc Espie <espie@openbsd.org>
-# 
+#
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
 # copyright notice and this permission notice appear in all copies.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
 # WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
 # MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -30,7 +30,7 @@ use File::Basename qw();
 
 use locale;
 
-my ($quick, $quick2, $cwd, $dbpath, $opt_L, $opt_l, $history, $ttyname, 
+my ($quick, $quick2, $cwd, $dbpath, $opt_L, $opt_l, $history, $ttyname,
     @external, $smart);
 
 
@@ -135,7 +135,7 @@ sub list_tags($quit = 0)
 
 sub prepare_completions()
 {
-	$attribs->{completion_word} = 
+	$attribs->{completion_word} =
 		$db->selectcol_arrayref('alltags');
 }
 
@@ -323,7 +323,7 @@ sub levenshtein_debug($max)
 sub edit_description()
 {
 	my $fh = File::Temp->new(
-		UNLINK => 0, 
+		UNLINK => 0,
 		TEMPLATE => "/tmp/edit.XXXXXXXXXXX"
 	    );
 	my $tempname = $fh->filename;
@@ -390,7 +390,7 @@ while (defined ($_ = $term->readline('> '))) {
 		parse_tags($1, 0,
 		    sub($tag) {
 			my $tags = $db->suggestions($tag);
-			say "Suggestions: ", 
+			say "Suggestions: ",
 			    join(' ', pretty_print_suggestions($tags));
 		    });
 	} elsif (m/^list\s*$/i) {

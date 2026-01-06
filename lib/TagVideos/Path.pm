@@ -3,11 +3,11 @@
 use v5.36;
 
 # Copyright (c) 2024 Marc Espie <espie@openbsd.org>
-# 
+#
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
 # copyright notice and this permission notice appear in all copies.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
 # WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
 # MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -28,7 +28,7 @@ sub resolve_link($class, $path)
 		if (File::Spec->file_name_is_absolute($p2)) {
 			$path = $p2;
 		} else {
-			$path = File::Spec->rel2abs($p2, 
+			$path = File::Spec->rel2abs($p2,
 			    File::Basename::dirname($path));
 	    	}
 	}
