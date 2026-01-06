@@ -2,11 +2,11 @@
 use v5.36;
 
 # Copyright (c) 2024 Marc Espie <espie@openbsd.org>
-# 
+#
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
 # copyright notice and this permission notice appear in all copies.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
 # WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
 # MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -19,36 +19,39 @@ package TagVideos::Model;
 use TagVideos::Base;
 our @ISA = qw(TagVideos::Base);
 
+# XXX
+# we could add a method to prepare requests "just in time"
+# but making them all allows checking syntax for them all
 my $requests = {
 	fh => qq{insert into file (path) values (?)},
 	alltags => qq{select tag from tag order by tag},
 	findid => qq{select id from file where path=?},
-	findtags => 
-	    qq{select tag.tag from tag 
+	findtags =>
+	    qq{select tag.tag from tag
 		join filetag on tagid=tag.id
 		join file on fileid = file.id
 		where fileid = ? order by tag.tag},
 	createtag => qq{insert into tag (tag) values (?)},
-	inserttag => 
+	inserttag =>
 	    qq{insert into filetag (fileid, tagid)
 		values (?, (select id from tag where tag=?))},
 	deletetag =>
 	    qq{delete from filetag where fileid=?
 		and tagid=(select id from tag where tag=?)},
 	suggestions =>
-	    qq{select tag.tag, count(filetag.id) from tag 
+	    qq{select tag.tag, count(filetag.id) from tag
 	    	join filetag on filetag.tagid=tag.id
 		join filetag t1 on t1.fileid=filetag.fileid
 		join tag t2 on t2.id=t1.tagid
-		where t2.tag=? 
-		    and tag.id!=t2.id 
-		    and tag.id not in 
+		where t2.tag=?
+		    and tag.id!=t2.id
+		    and tag.id not in
 			(select tagid from filetag where fileid=?)
 		group by tag.tag},
 	addnewtag =>
 	    qq{insert into filetag (tagid, fileid)
-	    	select t1.id,filetag.fileid from filetag 
-		    join tag t1 
+	    	select t1.id,filetag.fileid from filetag
+		    join tag t1
 		    join tag t2 on t2.id=filetag.tagid
 		    where t1.tag=? and t2.tag=?},
 	deleteoldtag =>
@@ -66,15 +69,19 @@ my $requests = {
 	wipetags =>
 	    qq{delete from filetag where fileid=?},
 	occurrences =>
-	    qq{select tag.tag, count(filetag.id) from tag 
-	    	join filetag on filetag.tagid=tag.id 
-		group by filetag.tagid 
+	    qq{select tag.tag, count(filetag.id) from tag
+	    	join filetag on filetag.tagid=tag.id
+		group by filetag.tagid
 		order by count(filetag.id), tag.tag},
+	cleanup =>
+	    qq{delete from tag where id in
+		(select id from tag where tag.id not in
+		    (select tagid from filetag))},
 };
 
 sub connect($class, $database)
 {
-	my $o = bless { 
+	my $o = bless {
 		db => $class->SUPER::connect($database, {})
 	    }, $class;
 	while (my ($k, $v) = each %$requests) {
@@ -306,10 +313,7 @@ sub occurrences($self, $limit)
 sub cleanup($self)
 {
 	$self->parse_rules;
-	$self->db->do(
-	    qq{delete from tag where id in 
-	    	(select id from tag where tag.id not in 
-		    (select tagid from filetag))});
+	$self->{cleanup}->execute;
 	$self->db->disconnect;
 }
 1;
