@@ -35,12 +35,9 @@ my ($output, $nolinks, @lists, @tags, @paths);
 if (!GetOptions(
 	'o=s' => \$output,
 	'L' => \$nolinks,
-	't=s' => sub($X, $value) {
-		push(@tags, $value);
-	},
-	'l=s' => sub($X, $value) {
-		push(@lists, $value);
-	}) || @ARGV == 0) {
+	't=s' => \@tags,
+	'l=s' => \@lists,
+	) || @ARGV == 0) {
 	
 	usage();
 }
