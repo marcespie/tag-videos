@@ -76,6 +76,8 @@ my $requests = {
 	    qq{delete from tag where id in
 		(select id from tag where tag.id not in
 		    (select tagid from filetag))},
+	rename =>
+	    qq{update file set path=? where id=?},
 };
 
 sub connect($class, $database)
@@ -120,6 +122,12 @@ sub set_path($self, $path)
 	}
 	$self->{id} = $id;
 	$self->{path} = $path;
+}
+
+sub rename_file($self, $newpath)
+{
+	$self->{path} = $newpath;
+	$self->{rename}->execute($self->{path}, $self->{id});
 }
 
 sub find_tags($self)
