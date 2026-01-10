@@ -55,6 +55,7 @@ sub create($class, $p)
 	for my $sql (split /;/, <DATA>) {
 		$db->do($sql.';');
 	}
+	seek(DATA, 0, 0);
 	return $db;
 }
 
