@@ -49,7 +49,7 @@ sub resolve_link($path)
 	if ($nolinks) {
 		return $path;
     	}
-	$cache->{$path} //= Tag::Videos::Path->resolve_link($path);
+	$cache->{$path} //= TagVideos::Path->resolve_link($path);
 	return $cache->{$path};
 }
 
