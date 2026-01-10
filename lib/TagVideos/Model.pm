@@ -24,7 +24,6 @@ our @ISA = qw(TagVideos::Base);
 # but making them all allows checking syntax for them all
 my $requests = {
 	fh => qq{insert into file (path) values (?)},
-	alltags => qq{select tag from tag order by tag},
 	findid => qq{select id from file where path=?},
 	findtags =>
 	    qq{select tag.tag from tag
@@ -308,6 +307,19 @@ sub occurrences($self, $limit)
 	}
 	$s->finish;
 	return @r;
+}
+
+sub all_tags($self)
+{
+	my $s = $self->{occurrences};
+	my $h;
+	$s->execute;
+	my ($tag, $count);
+	$s->bind_columns(\($tag, $count));
+	while ($s->fetch) {
+		$h->{$tag} = $count;
+	}
+	return $h;
 }
 
 sub cleanup($self)

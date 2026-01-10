@@ -26,7 +26,6 @@ use lib "$FindBin::Bin/lib";
 use TagVideos::Model;
 use TagVideos::Path;
 use File::Copy qw();
-use File::Basename qw();
 
 use locale;
 
@@ -106,6 +105,7 @@ $attribs->{completion_entry_function} = $attribs->{list_completion_function};
 
 $history //= $ENV{HOME}."/.tag-videos-history";
 my $quit_re = qr{^(?:quit|q)\s*$}i;
+my $freq;
 
 if (-f $history) {
 	$term->ReadHistory($history);
@@ -135,16 +135,23 @@ sub list_tags($quit = 0)
 
 sub prepare_completions()
 {
-	$attribs->{completion_word} = 
-		$db->selectcol_arrayref('alltags');
+	$freq = $db->all_tags;
+	my @k = keys %$freq;
+	$attribs->{completion_word} = \@k;
 }
+
+my $separator = '-'x20;
 
 sub prompt_ambiguous($list)
 {
 	my $i = 0;
 	for my $e (@$list) {
 		$i++;
-		say sprintf("%3d %s", $i, $e);
+		if ($e ne $separator) {
+			say sprintf("%3d %s", $i, $e);
+		} else {
+			say $e;
+		}
 	}
 	say sprintf("%3d %s", 0, "<nothing>");
 	my $choice;
@@ -155,7 +162,7 @@ sub prompt_ambiguous($list)
 			next;
 		}
 		my $j = int($choice);
-		if ($j < 0 || $j > @$list) {
+		if ($j < 0 || $j > @$list || $list->[$j-1] eq $separator) {
 			next;
 		}
 		if ($j == 0) {
@@ -284,10 +291,12 @@ sub levenshtein_best($tag,$h2)
 	my $result = [];
 	for my $i (0 .. @$buckets) {
 		next if !defined $buckets->[$i];
-		push(@$result, @{$buckets->[$i]});
+		push(@$result, 
+		    sort {$freq->{$b} <=> $freq->{$a}} @{$buckets->[$i]});
 		if (++$add >= $smart_threshold) {
 			last;
 		}
+		push(@$result, $separator);
 	}
 	return $result;
 }
