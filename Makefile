@@ -15,6 +15,8 @@ MODULES = {Base,Model,Path}.pm
 
 DESTDIR =
 
+all:
+	# nothing to build
 
 install:
 	@${INSTALL_BIN} ${BINS} $(DESTDIR)${BINDIR}
@@ -34,4 +36,4 @@ uninstall:
 	@rm -f $(DESTDIR)${LIBDIR}/TagVideos/${MODULES}
 	@-rmdir $(DESTDIR)${LIBDIR}/TagVideos
 
-.PHONY: install uninstall test
+.PHONY: install uninstall test all

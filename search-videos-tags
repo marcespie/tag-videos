@@ -1,11 +1,11 @@
 #! /usr/bin/perl
 
 # Copyright (c) 2024 Marc Espie <espie@openbsd.org>
-# 
+#
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
 # copyright notice and this permission notice appear in all copies.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
 # WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
 # MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -51,15 +51,15 @@ if ($opts->{l} && -r 'video_tags') {
 my $db = TagVideos::Base->connect($dbpath, {ReadOnly => 1});
 
 my $query = qq{
-	select distinct path from file 
+	select distinct path from file
 		join filetag on filetag.fileid=file.id};
 my $subquery = qq{
-	select fileid from filetag 
+	select fileid from filetag
 		join tag on tag.id=filetag.tagid};
 
 my $emptytag = qq{
 	select distinct path from file
-	    where id not in 
+	    where id not in
 		(select fileid from filetag) order by path};
 
 my $test = $db->prepare(qq{

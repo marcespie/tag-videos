@@ -3,11 +3,11 @@
 use v5.36;
 
 # Copyright (c) 2024 Marc Espie <espie@openbsd.org>
-# 
+#
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
 # copyright notice and this permission notice appear in all copies.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
 # WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
 # MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -32,7 +32,7 @@ sub connect($class, $path = undef, $h = {})
 		say "Creating database $p";
 		$class->create($p);
 	}
-	my $db = DBI->connect("dbi:SQLite:dbname=$p", "", "", 
+	my $db = DBI->connect("dbi:SQLite:dbname=$p", "", "",
 	    {
 		RaiseError => 1,
 		PrintError => 0});
@@ -71,13 +71,13 @@ __DATA__
 -- XXX maybe it would be better to have a directory/file separation
 -- together with a file view ?
 PRAGMA encoding = "UTF-8";
-CREATE TABLE if not exists file 
+CREATE TABLE if not exists file
 	(Id integer primary key, path text not null unique on conflict ignore);
-CREATE TABLE if not exists tag 
+CREATE TABLE if not exists tag
 	(Id integer primary key, tag text not null unique on conflict ignore);
-CREATE TABLE if not exists filetag 
-	(Id integer primary key, FileId integer not null, 
-	TagId integer not null, 
+CREATE TABLE if not exists filetag
+	(Id integer primary key, FileId integer not null,
+	TagId integer not null,
 	constraint nodups unique (FileId, TagId) on conflict ignore);
 CREATE TABLE if not exists descr
 	(Id integer primary key, FileId integer unique, Descr text not null);
