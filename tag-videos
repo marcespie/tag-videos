@@ -352,6 +352,31 @@ sub edit_description()
 	unlink($tempname);
 }
 
+sub move_file($newpath)
+{
+	my (undef, $dirname, $basename) = File::Spec->splitpath($path);
+	# figure out where $newpath is compared to current path
+	if (!File::Spec->file_name_is_absolute($newpath)) {
+		$newpath = File::Spec->rel2abs($newpath, $dirname);
+	}
+	if (!$opt_L) {
+		$newpath = TagVideos::Path->resolve_link($newpath);
+	}
+	if (-d $newpath) {
+		$newpath = File::Spec->catpath(undef, $newpath, $basename);
+	}
+	if (-e $newpath) {
+		say STDERR "Can't move to $newpath, already exists";
+		return;
+	}
+	if (File::Copy::move($path, $newpath)) {
+		$db->rename_file($newpath);
+		$path = $newpath;
+	} else {
+		say STDERR "An error occurred $!";
+	}
+}
+
 
 if (defined $path) {
 	list_tags($quick);
@@ -405,19 +430,8 @@ while (defined ($_ = $term->readline('> '))) {
 	} elsif (m/^list\s*$/i) {
 		list_tags();
 
-#	} elsif (m/^move\b\s+(.*)$/i) {
-		# XXX this is not finished
-#		my $newname = $1;
-#		if (File::Copy::move($path, $newname)) {
-#			if (-d $newname) {
-#				$newname = File::Spec->catfile($newname,
-#				    File::Basename::basename($path));
-#			}
-#			$newname = File::Spec->rel2abs($newname, $cwd);
-#			if (!$opt_L) {
-#				$newname = TagVideos::Path->resolve_link($path);
-#			}
-#		}
+	} elsif (m/^move\b\s+(.*)$/i) {
+		move_file($1);
 	} elsif (m/^known\b\s*(.*)$/) {
 		my $filter = $1;
 		my @tags = @{$attribs->{completion_word}};
@@ -447,7 +461,7 @@ while (defined ($_ = $term->readline('> '))) {
 			$smart = 0;
 		}
 	} elsif (m/^help\s*|^\?\s+$/i) {
-		say "help/man/add/t/rm/rename/list";
+		say "help/man/add/t/rm/rename/list/move";
 		say "suggest/distance/distancelog...";
 		say "smart/showrules/rmrule/descr/known/wipe/quit"
 	} elsif (m/$quit_re/) {
