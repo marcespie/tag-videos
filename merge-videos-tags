@@ -71,7 +71,7 @@ if (-e $output) {
 	$real = $output;
 }
 
-my $dbout = TagVideos::Base->connect($real);
+my $dbout = TagVideos::Base->connect($real, { AutoCommit => 0});
 my $addtag = $dbout->prepare(
 	qq{insert into tag (tag) values (?);});
 my $addfile = $dbout->prepare(

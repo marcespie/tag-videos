@@ -47,9 +47,9 @@ sub connect($class, $path = undef, $h = {})
 	return DBI->connect("dbi:SQLite:dbname=$p", "", "", $h);
 }
 
-sub create($class, $p)
+sub create($class, $p, $h = {})
 {
-	my $db = DBI->connect("dbi:SQLite:dbname=$p", "", "");
+	my $db = DBI->connect("dbi:SQLite:dbname=$p", "", "", $h);
 	undef $/;
 	# XXX somehow DBI want separate statements, so we split on ;
 	for my $sql (split /;/, <DATA>) {
