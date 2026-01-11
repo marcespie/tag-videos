@@ -4,3 +4,7 @@ tag !tag IF conditions
 but delete does not match insert into ... select at all
 
 add -D ! to search video-tags, to find videos without any description
+(maybe)
+
+add a "spread" functionality that could spread a tag (or all tags) to all videos
+inside the same directory (useful for vacation tags and whatnot)
