@@ -20,7 +20,7 @@
 .Nd interactive tag manager for use with mpv
 .Sh SYNOPSIS
 .Nm
-.Op Fl Llqs
+.Op Fl Llqsu
 .Op Fl c Ar cwd
 .Op Fl d Ar database
 .Op Fl h Ar history
@@ -107,6 +107,13 @@ inside an external program after handling
 .Fl q ,
 for instance:
 .Nm Fl q Fl x xterm -geometry +0+0 -e Ar path .
+.It Fl u
+By default,
+.Nm
+creates a lockfile under
+.Pa /tmp
+to avoid opening several interfaces to the same path.
+Disable that behavior.
 .It Fl X Ar cmd ...
 Rerun
 .Nm

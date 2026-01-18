@@ -26,11 +26,18 @@ use lib "$FindBin::Bin/lib";
 use TagVideos::Model;
 use TagVideos::Path;
 use File::Copy qw();
+use Digest::SHA;
+use MIME::Base64;
+use Fcntl qw(O_EXCL O_WRONLY O_CREAT);
 
 use locale;
 
 my ($quick, $quick2, $cwd, $dbpath, $opt_L, $opt_l, $history, $ttyname,
-    @external, $smart);
+    @external, $smart, $nolock, $lockname, $lock);
+
+END {
+	unlink($lockname) if defined $lockname;
+}
 
 
 if (!GetOptions(
@@ -43,11 +50,12 @@ if (!GetOptions(
     L => \$opt_L,
     'H=s' => \$history,
     't=s' => \$ttyname,
+    'u' => \$nolock,
     'X=s' => sub($X, $value) {
     	push(@external, split(/\,/, $value));
 	},
     'x=s' => \@external) || @ARGV >1 ) {
-	TagVideos::Base->usage("[-LlqQ]", "[-c cwd]", "[-d database]",
+	TagVideos::Base->usage("[-LlqQsu]", "[-c cwd]", "[-d database]",
 		"[-H history]", "[-t tty]", "[-[x|X] cmd...]", "path");
 	exit 1;
 }
@@ -57,6 +65,24 @@ my $smart_threshold = 3;
 # as it stands the script gets two parameters: cwd + path name
 
 my $path;
+
+if (@ARGV == 1) {
+	$path = File::Spec->rel2abs($ARGV[0], $cwd);
+
+	if (!$opt_L) {
+		$path = TagVideos::Path->resolve_link($path);
+	}
+	if (!$nolock) {
+		my $d = Digest::SHA->new(256);
+		$d->addfile($path);
+		my $h = encode_base64($d->digest, '');
+		$lockname = "/tmp/tag.lock.$h";
+		if (!sysopen($lock, $lockname, O_WRONLY|O_EXCL|O_CREAT, 0666)) {
+			exit 0;
+		}
+
+	}
+}
 
 if ($opt_l && -r 'video_tags') {
 	$dbpath //= 'video_tags';
@@ -79,15 +105,10 @@ if (defined $ttyname) {
 
 my $db = TagVideos::Model->connect($dbpath);
 
-if (@ARGV == 1) {
-	$path = File::Spec->rel2abs($ARGV[0], $cwd);
 
-	if (!$opt_L) {
-		$path = TagVideos::Path->resolve_link($path);
-	}
+say "Database is ", TagVideos::Model->dbpath($dbpath);
 
-
-	say "Database is ", TagVideos::Model->dbpath($dbpath);
+if (defined $path) {
 	say "Filename is: $path";
 
 	$db->set_path($path);
@@ -96,7 +117,6 @@ if (@ARGV == 1) {
 		say "Descr:";
 		say $descr;
 	}
-
 }
 
 my $term = Term::ReadLine->new("tag-videos", $in, $out);
