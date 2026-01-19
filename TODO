@@ -8,3 +8,15 @@ add -D ! to search video-tags, to find videos without any description
 
 add a "spread" functionality that could spread a tag (or all tags) to all videos
 inside the same directory (useful for vacation tags and whatnot)
+
+Basically, it should be everywhere... like being able to tag-videos dir
+and use File::Find to tag everything under that directory.
+
+Say you got a ski vacation directory, it's no brainer that you want to
+put a set of tags on THAT directory all at once
+
+Maybe use some introspection tools on videos and photo and automatically
+put some metadata in the DB ? that would mean another table
+
+Like, photos have date taken, and most video formats as well (though it's
+less useful)
