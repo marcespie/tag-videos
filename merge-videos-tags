@@ -60,8 +60,10 @@ if (!defined $output) {
 
 
 my ($temp, $real);
+
 if (-e $output) {
-	(undef, $temp) = tempfile();
+	unshift(@ARGV, $output);
+	(undef, $temp) = File::Temp::tempfile();
 	if (!defined $temp) {
 		say STDERR "Couldn't create temp database";
 		exit 1;
@@ -86,10 +88,6 @@ my $adddescr = $dbout->prepare(
 	qq{insert into descr (fileid, descr)
 		values ((select id from file where path=?), ?);});
 			
-if (-f $output) {
-	unshift(@ARGV, $output);
-}
-
 my $inserter;
 for my $l (@lists) {
 	my $input;
@@ -155,6 +153,7 @@ if (@tags > 0 && @paths > 0) {
 	}
 }
 
+$dbout->commit;
 $dbout->disconnect;
 if (defined $temp) {
 	File::Copy::move($temp, $output);
