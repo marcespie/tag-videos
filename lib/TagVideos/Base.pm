@@ -50,7 +50,7 @@ sub connect($class, $path = undef, $h = {})
 sub create($class, $p, $h = {})
 {
 	my $db = DBI->connect("dbi:SQLite:dbname=$p", "", "", $h);
-	undef $/;
+	local $/;
 	# XXX somehow DBI want separate statements, so we split on ;
 	for my $sql (split /;/, <DATA>) {
 		$db->do($sql.';');
