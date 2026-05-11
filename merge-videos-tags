@@ -87,6 +87,9 @@ my $tagfile = $dbout->prepare(
 my $adddescr = $dbout->prepare(
 	qq{insert into descr (fileid, descr)
 		values ((select id from file where path=?), ?);});
+
+my $addrule = $dbout->prepare(
+	qq{insert into rules (rule) values (?);});
 			
 my $inserter;
 for my $l (@lists) {
@@ -114,7 +117,7 @@ for my $l (@lists) {
 for my $i (@ARGV) {
 	my $db = TagVideos::Base->connect($i, {ReadOnly => 1});
 	my $gettag = $db->prepare(qq{select tag from tag});
-	my ($tag, $path, $descr);
+	my ($tag, $path, $descr, $rule);
 	$gettag->bind_columns(\($tag));
 	$gettag->execute;
 	while ($gettag->fetch) {
@@ -141,6 +144,12 @@ for my $i (@ARGV) {
 	$getdescr->execute;
 	while ($getdescr->fetch) {
 		$adddescr->execute(resolve_link($path), $descr);
+	}
+	my $getrule = $db->prepare(qq{select rule from rules});
+	$getrule->bind_columns(\$rule);
+	$getrule->execute;
+	while ($getrule->fetch) {
+		$addrule->execute($rule);
 	}
 }
 
