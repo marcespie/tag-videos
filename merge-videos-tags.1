@@ -23,8 +23,8 @@
 .Op Fl L
 .Op Fl l Ar input
 .Op Fl t Ar tag
-.Fl o Ar output
-.Op Ar db ...
+.Op Fl o Ar output
+.Ar db ...
 .Sh DESCRIPTION
 Merge several databases together,
 resolve the symlink paths, and update the database schema.
@@ -36,8 +36,10 @@ can also be one of the input arguments,
 as the database is always recreate as a temporary file first.
 .Pp
 If no
+.Ar output
+is mentioned, and there is just one
 .Ar db
-is mentioned, then instead of updating the schema/merging databases,
+then instead of updating the schema/merging databases,
 .Nm
 will only add the paths from
 .Ar input
