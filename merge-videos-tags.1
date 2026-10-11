@@ -24,7 +24,7 @@
 .Op Fl l Ar input
 .Op Fl t Ar tag
 .Fl o Ar output
-.Ar db ...
+.Op Ar db ...
 .Sh DESCRIPTION
 Merge several databases together,
 resolve the symlink paths, and update the database schema.
@@ -34,6 +34,18 @@ Note that the
 database
 can also be one of the input arguments,
 as the database is always recreate as a temporary file first.
+.Pp
+If no
+.Ar db
+is mentioned, then instead of updating the schema/merging databases,
+.Nm
+will only add the paths from
+.Ar input
+and any
+.Ar tag .
+It is an error to use
+.Nm
+in this mode without at least some paths.
 .Pp
 This command will always recreate the merged database
 from scratch, so the schema is also updated.

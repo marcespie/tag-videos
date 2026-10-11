@@ -54,23 +54,25 @@ sub resolve_link($path)
 }
 
 
-if (!defined $output) {
-	usage();
-}
-
-
 my ($temp, $real);
 
-if (-e $output) {
-	unshift(@ARGV, $output);
-	(undef, $temp) = File::Temp::tempfile();
-	if (!defined $temp) {
-		say STDERR "Couldn't create temp database";
-		exit 1;
-	}
-	$real = $temp;
+if (!defined $output) {
+	if (@lists == 0 || @ARGV != 1) {
+		usage();
+	} else {
+		$real = shift @ARGV;
 } else {
-	$real = $output;
+	if (-e $output) {
+		unshift(@ARGV, $output);
+		(undef, $temp) = File::Temp::tempfile();
+		if (!defined $temp) {
+			say STDERR "Couldn't create temp database";
+			exit 1;
+		}
+		$real = $temp;
+	} else {
+		$real = $output;
+	}
 }
 
 my $dbout = TagVideos::Base->connect($real, { AutoCommit => 0});
