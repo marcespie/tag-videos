@@ -61,6 +61,7 @@ if (!defined $output) {
 		usage();
 	} else {
 		$real = shift @ARGV;
+	}
 } else {
 	if (-e $output) {
 		unshift(@ARGV, $output);
