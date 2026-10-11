@@ -101,8 +101,7 @@ for my $l (@lists) {
 		    die "Incorrect input file $l: $!";
 	}
 	$inserter //= $dbout->prepare(qq{
-		insert into file (path) values (?)
-		    on conflict do nothing});
+		insert or ignore into file (path) values (?)});
 	while (<$input>) {
 		chomp;
 		my $p2 = resolve_link($_);

@@ -29,6 +29,12 @@
 Merge several databases together,
 resolve the symlink paths, and update the database schema.
 .Pp
+Note that the
+.Ar output
+database
+can also be one of the input arguments,
+as the database is always recreate as a temporary file first.
+.Pp
 This command will always recreate the merged database
 from scratch, so the schema is also updated.
 Options are as follows

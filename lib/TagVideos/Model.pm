@@ -78,6 +78,11 @@ my $requests = {
 		    (select tagid from filetag))},
 	rename =>
 	    qq{update file set path=? where id=?},
+	spread =>
+		qq{insert into filetag (tagid, fileid)
+		    select tag.id, file.id from tag, file
+		    where tag.tag=? and file.path like ?},
+
 };
 
 sub connect($class, $database)
