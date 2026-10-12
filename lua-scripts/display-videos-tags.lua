@@ -15,8 +15,9 @@
 -- simple example to run display-video-tags on initial run
 -- and on file load
 
-function handle_tags(p)
+function handle_tags()
     -- set up the command we want to run and capture stdout
+    p = mp.get_property("path", "string"))
     local result = mp.command_native({
         name = "subprocess",
         args = { "display-videos-tags", p },
@@ -35,7 +36,7 @@ end
 
 -- make it so that the hook will run when file is loaded
 function onFileLoaded()
-    handle_tags(mp.get_property("path", "string"))
+    handle_tags()
 end
 
 mp.register_event("file-loaded", onFileLoaded)
