@@ -24,8 +24,8 @@ use locale;
 
 my $opts = {};
 
-if (!getopts('vd:Ll', $opts) || @ARGV != 1) {
-	TagVideos::Base->usage("[-Llv] [-d database ] filename");
+if (!getopts('vd:Llt:', $opts) || @ARGV != 1) {
+	TagVideos::Base->usage("[-Llv] [-t prompt] [-d database ] filename");
 }
 
 my $dbpath = $opts->{d};
@@ -33,6 +33,7 @@ if ($opts->{l} && -r 'video_tags') {
 	$dbpath //= 'video_tags';
 }
 
+my $prompt = $opts->{t} // "Tags: ";
 my $db = TagVideos::Base->connect($dbpath, {ReadOnly => 1});
 
 my $query = $db->prepare(qq{
@@ -53,4 +54,4 @@ while ($query->fetch) {
 if ($opts->{v}) {
 	print "[$path] ";
 }
-say "Tags: ", join(' ', @tags);
+say $prompt, join(' ', @tags);

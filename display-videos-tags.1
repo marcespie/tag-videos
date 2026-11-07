@@ -22,6 +22,7 @@
 .Nm
 .Op Fl Llv
 .Op Fl d Ar database
+.Op Fl t prompt
 .Ar path
 .Sh DESCRIPTION
 Show tags associated with a given
@@ -51,6 +52,10 @@ in the current directory, this supersedes env variable.
 .It Fl d Ar database
 Select another database instead of the default
 .Pa $HOME/videos_tags .
+.It Fl t Ar prompt
+Replaces the default prompt
+.Sq Tags:
+with a custom string in front of the tag list.
 .It Fl v
 Resolve link to the
 .Ar path
